@@ -1,0 +1,16 @@
+name: workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  markdown:
+    runs-on: [ubuntu-20.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Markdown link check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
