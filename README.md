@@ -1,5 +1,7 @@
 # ros2_d - ROS2 client library written in Dlang
 
+[![workflow](https://github.com/nonanonno/ros2_d/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/nonanonno/ros2_d/actions/workflows/workflow.yml)
+
 [日本語](doc/README_JP.md)
 
 This is a ROS2 client library written in Dlang that does **not** depend on ROS2 build infrastructure (`colcon`). `dub build` is all you need. The details about the build process is [here](doc/build_process.md).
