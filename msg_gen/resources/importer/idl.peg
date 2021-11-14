@@ -1,0 +1,26 @@
+Idl:
+    Sentence    < (Comment / Include / Module)*
+    Module      < "module" Name "{" (Module / (Verbatim? Struct) / Empty)* "};"
+    Struct      < "struct" Name "{" (Verbatim? Member)* "};"
+    Member      < (ArrayType / Type) Field ";"
+    Include     < "#include" FileName
+    Verbatim    < "@verbatim" '(' VerbContent? (',' VerbContent)* ')'
+    VerbContent < Type '=' Text
+
+    Name        <- identifier
+    Type        <- (identifier "::" identifier "::")? identifier
+    ArrayType   <- "sequence" '<' Type '>'
+    Field       <- identifier
+    Empty       <- eps
+    FileName    <- StringLiteral
+    Text        < StringLiteral StringLiteral*
+
+    Comment <~ "//" (!endOfLine .)* endOfLine
+    StringLiteral <~ doublequote (DQChar)* doublequote
+    DQChar <- EscapeSequence
+            / !doublequote .
+    EscapeSequence <~ backslash ( quote
+                                / doublequote
+                                / backslash
+                                / [abfnrtv]
+                                )

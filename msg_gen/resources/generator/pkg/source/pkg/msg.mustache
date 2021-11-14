@@ -1,0 +1,14 @@
+// dfmt off
+module {{moduleName}};
+
+{{#depends}}
+import {{name}};
+{{/depends}}
+{{#messages}}
+struct {{name}}
+{
+    {{#members}}
+    {{type}} {{name}};
+    {{/members}}
+}
+{{/messages}}

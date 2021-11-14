@@ -1,0 +1,19 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"dxml": "~>0.4.3",
+		"mustache-d": "~>0.1.5",
+		"pegged": "~>0.4.5",
+		"silly": "~>1.1.1"
+	},
+	"targetType": "autodetect",
+	"description": "ROS2 message generator",
+	"license": "Apache-2.0",
+	"name": "msg_gen",
+	"stringImportPaths": [
+		"resources"
+	]
+}

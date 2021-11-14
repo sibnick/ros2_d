@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"description": "ROS2 Client Library for Dlang",
+	"license": "Apache-2.0",
+	"name": "ros2_d",
+	"subPackages": [
+		"./msg_gen"
+	]
+}

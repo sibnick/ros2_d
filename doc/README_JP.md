@@ -3,7 +3,7 @@
 これはD言語向けROS2クライアントライブラリです。ROS2 のビルドプロセスから離れ`dub build` のみでビルドできるようになっています(予定)。ビルドプロセスの詳細は[こちら](build_process.md)に記載しています。
 
 - [ ] rcl_bind : rclバインディングパッケージ
-- [ ] msg_gen : typesupport_introspection を使ってメッセージジェネレータ
+- [ ] msg_gen : IDLファイルを読み込みD言語向けメッセージ定義を生成するジェネレータ
 - [ ] rcld : D言語向け ROS2クライアントライブラリAPI
 
 
