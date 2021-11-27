@@ -15,7 +15,15 @@ jobs:
       - name: Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
   test:
-    runs-on: [self-hosted, foxy]
+    strategy:
+      fail-fast: false
+      matrix:
+        ros:
+          - foxy
+          - galactic
+          - rolling
+      
+    runs-on: ${{ matrix.ros }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,7 +33,7 @@ jobs:
       - uses: sergeysova/jq-action@v2
       - name: Run build
         run: |
-          . /opt/ros/foxy/setup.bash
+          . /opt/ros/${{ matrix.ros }}/setup.bash
           bash example/test/build_all.sh
       - name: Run tests
         run: |

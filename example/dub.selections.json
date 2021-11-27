@@ -1,8 +1,0 @@
-{
-	"fileVersion": 1,
-	"versions": {
-		"builtin_interfaces": "1.0.0",
-		"ros2_d": {"path":"../"},
-		"std_msgs": "2.0.4"
-	}
-}
