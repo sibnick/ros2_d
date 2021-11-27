@@ -1,0 +1,22 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"description": "ROS2 binding for D",
+	"license": "Apache-2.0",
+	"name": "rcl_bind",
+	"targetType": "sourceLibrary",
+	"preGenerateCommands": [
+		"make -f gen.mk"
+	],
+	"lflags": [
+		"-L/opt/ros/${ROS_DISTRO}/lib"
+	],
+	"libs": [
+			"rcl",
+			"rcutils",
+			"rosidl_typesupport_c",
+			"rosidl_runtime_c"
+	]
+}

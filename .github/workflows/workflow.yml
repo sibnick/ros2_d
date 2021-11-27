@@ -15,13 +15,18 @@ jobs:
       - name: Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
   test:
-    runs-on: [ubuntu-20.04]
+    runs-on: [self-hosted, foxy]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
+      - uses: sergeysova/jq-action@v2
+      - name: Run build
+        run: |
+          . /opt/ros/foxy/setup.bash
+          bash example/test/build_all.sh
       - name: Run tests
         run: |
           dub test :msg_gen

@@ -1,0 +1,19 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"description": "ros2_d examples",
+	"license": "Apache-2.0",
+	"name": "example",
+	"dependencies": {
+		"ros2_d:rcl_bind": "*"
+	},
+	"configurations": [
+		{
+			"name": "rcl_node",
+			"targetType": "executable",
+			"sourcePaths": ["minamoto/rcl_node"]
+		}
+	]
+}
