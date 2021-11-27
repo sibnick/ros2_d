@@ -2,13 +2,21 @@
 
 set -e
 
-# move to ros2_d
-cd $(dirname $0)/../../
+# move to example
+cd $(dirname $0)/../
 
-configs=$(cat example/dub.json | jq -r ".configurations | .[] | .name")
+configs=$(cat dub.json | jq -r ".configurations | .[] | .name")
 echo $configs
 
+dub add-local ..
+
+function on_exit() {
+  dub remove-local ..
+}
+trap on_exit EXIT
+
+dub run ros2_d:msg_gen -- .dub/packages
 # build
 for c in $configs; do
-  dub build :example -c $c
+  dub build -c $c
 done

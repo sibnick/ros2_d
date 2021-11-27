@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "{{version}}",
     "description": "{{package_name}} for Dlang",
     "license": "Apache-2.0",
     "name": "{{package_name}}",
@@ -11,8 +11,8 @@
     ],
     "dependencies": {
         {{#depends}}
-        "{{name}}": "~>1.0.0",
+        "{{name}}": "*",
         {{/depends}}
-        "rcl_bind": "~>0.0.1"
+        "ros2_d:rcl_bind": "*"
     }
 }

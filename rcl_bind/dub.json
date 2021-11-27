@@ -18,5 +18,6 @@
 			"rcutils",
 			"rosidl_typesupport_c",
 			"rosidl_runtime_c"
-	]
+	],
+	"version": "0.0.1"
 }

@@ -29,6 +29,19 @@ bool has(string field)(const ParseTree p)
     return false;
 }
 
+ParseTree[] all(string field)(const ParseTree p)
+{
+    ParseTree[] rslt;
+    foreach (c; p.children)
+    {
+        if (c.name == prefix ~ field)
+        {
+            rslt ~= c.dup;
+        }
+    }
+    return rslt;
+}
+
 string getData(const ParseTree p)
 {
     return p.matches.join();

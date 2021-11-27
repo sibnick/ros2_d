@@ -8,7 +8,7 @@ import {{name}};
 struct {{name}}
 {
     {{#members}}
-    {{type}} {{name}};
+    {{type}} {{name}}{{#default?}} = {{{value}}}{{/default?}};
     {{/members}}
 }
 {{/messages}}

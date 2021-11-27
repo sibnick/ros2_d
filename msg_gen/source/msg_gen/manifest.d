@@ -14,6 +14,12 @@ struct Manifest
 {
     string packageName;
     MessageModule message;
+    string version_;
+
+    bool hasMessages() const
+    {
+        return message.messages.length != 0;
+    }
 
     string[] depends() const @property
     {
@@ -31,6 +37,10 @@ auto get(string field, R)(DOMEntity!R entry)
 {
     foreach (e; entry.children)
     {
+        if (e.type == EntityType.comment)
+        {
+            continue;
+        }
         if (e.name == field)
         {
             return e;
@@ -39,30 +49,58 @@ auto get(string field, R)(DOMEntity!R entry)
     assert(0);
 }
 
+auto has(string field, R)(DOMEntity!R entry)
+{
+    foreach (e; entry.children)
+    {
+        if (e.type == EntityType.comment)
+        {
+            continue;
+        }
+        if (e.name == field)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 Manifest loadROS2Package(string root)
 {
     enforce(exists(root ~ "/package.xml"));
+    auto m = Manifest();
+
     auto dom = parseDOM(readText(root ~ "/package.xml"));
     auto pkg = dom.get!"package";
     auto pkgName = pkg.get!"name".children[0].text;
-    auto m = Manifest();
     m.packageName = pkgName;
+    m.version_ = pkg.get!"version".children[0].text;
 
-    MessageModule[string] mms;
+    if (!(pkg.has!"member_of_group" && pkg.get!"member_of_group".children[0].text == "rosidl_interface_packages"))
+    {
+        return m;
+    }
 
     const msgDir = root ~ "/msg";
-    auto idls = dirEntries(msgDir, "*.idl", SpanMode.depth);
+    if (msgDir.exists)
+    {
+        MessageModule[string] mms;
 
-    foreach (idl; idls)
-    {
-        auto msg = Idl(readText(idl));
-        setMessageModule(mms, msg);
+        auto idls = dirEntries(msgDir, "*.idl", SpanMode.shallow);
+
+        foreach (idl; idls)
+        {
+            auto msg = Idl(readText(idl));
+            setMessageModule(mms, msg);
+        }
+        assert(mms.length <= 1);
+        foreach (_, mm; mms)
+        {
+            m.message = mm;
+        }
+
     }
-    assert(mms.length <= 1);
-    foreach (_, mm; mms)
-    {
-        m.message = mm;
-    }
+
     return m;
 
 }

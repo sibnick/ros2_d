@@ -5,7 +5,9 @@ import std.file;
 void main(string[] args)
 {
     auto g = new DUBGenerator();
-    auto m = loadROS2Package(args[1]);
-    g.makePackage(m, args[2]);
-
+    auto packages = findMessagePackages();
+    foreach (p; packages)
+    {
+        g.makePackageAsDependency(p, args[1]);
+    }
 }

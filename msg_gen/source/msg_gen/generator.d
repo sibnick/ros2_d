@@ -7,6 +7,7 @@ import std.string;
 import std.array;
 import std.file;
 import std.stdio;
+import std.typecons;
 
 alias Mustache = MustacheEngine!string;
 alias Context = Mustache.Context;
@@ -15,6 +16,10 @@ void insert(Context cxt, Member member)
 {
     cxt["type"] = member.typeName.namespaced ~ (member.typeName.isArray ? "[]" : "");
     cxt["name"] = member.fieldName;
+    if (!member.defaultValue.isNull)
+    {
+        cxt["default?"] = ["value": member.defaultValue.get];
+    }
 }
 
 void insert(Context cxt, Structure structure)
@@ -53,50 +58,37 @@ class DUBGenerator
         return mustache.renderString(msgTmpl, cxt);
     }
 
-    @("Header Bool")
+    @("msg")
     unittest
     {
-        auto mm = MessageModule("std_msgs.msg", [
+        auto mm = MessageModule("test_msgs.msg", [
                 DependentType("builtin_interfaces.msg.Time"),
-                ], [
-                Message("Header", [
-                        Member(Type("builtin_interfaces.msg.Time"), "stamp", ""),
-                        Member(Type("string"), "frame_id", ""),
+            ], [
+                Message("StandAlone", [
+                        Member(Type("bool"), "data1"),
+                        Member(Type("int"), "data2", "0".nullable),
+                        Member(Type("float"), "data3", "0.0".nullable),
+                        Member(Type("string"), "data4", "\"hello\"".nullable),
+                        Member(Type("int", true), "array1"),
+                        Member(Type("int", true), "array2", "[-1, 0, 1]".nullable),
+                        Member(Type("string", true), "array3", "[\"aa\", \"bb\"]".nullable),
                     ]),
-                Message("Bool", [
-                        Member(Type("bool"), "data", ""),
+                Message("Depend", [
+                        Member(Type("builtin_interfaces.msg.Time"), "stamp"),
+                        Member(Type("string"), "data"),
                     ]),
-                ]);
+            ]);
         auto g = new DUBGenerator();
-
         auto answer = g.renderMessage(mm);
-        enum reference = import("test/std_msgs/header_bool.d");
+        enum reference = import("test/test_msgs/msg.d");
         assert(answer == reference, "\n" ~ answer);
     }
 
-    @("Int32MultiArray")
-    unittest
-    {
-        auto mm = MessageModule("std_msgs.msg", [
-                DependentType("std_msgs.msg.MultiArrayLayout"),
-                ], [
-                Message("Int32MultiArray", [
-                        Member(Type("std_msgs.msg.MultiArrayLayout"), "layout", ""),
-                        Member(Type("int", true), "data", ""),
-                    ]),
-                ]);
-        auto g = new DUBGenerator();
-
-        auto answer = g.renderMessage(mm);
-        enum reference = import("test/std_msgs/int32_multi_array.d");
-        assert(answer == reference, "\n" ~ answer);
-
-    }
-
-    public string renderDUB(string packageName, string[] depends)
+    public string renderDUB(string packageName, string version_, string[] depends)
     {
         auto cxt = new Mustache.Context();
         cxt["package_name"] = packageName;
+        cxt["version"] = version_;
         foreach (d; depends)
         {
             auto sub = cxt.addSubContext("depends");
@@ -109,8 +101,8 @@ class DUBGenerator
     unittest
     {
         auto g = new DUBGenerator();
-        auto answer = g.renderDUB("std_msgs", ["builtin_interfaces"]);
-        enum reference = import("test/std_msgs/dub.json");
+        auto answer = g.renderDUB("test_msgs", "1.0.0", ["builtin_interfaces"]);
+        enum reference = import("test/test_msgs/dub.json");
         assert(answer == reference, "\n" ~ answer);
     }
 
@@ -121,13 +113,23 @@ class DUBGenerator
         auto dub = File(pkgRoot ~ "/dub.json", "w");
         scope (exit)
             dub.close();
-        dub.write(renderDUB(m.packageName, m.depends));
+        dub.write(renderDUB(m.packageName, m.version_, m.depends));
         auto srcDir = [pkgRoot, "source", m.packageName].join('/');
         mkdirRecurse(srcDir);
-        auto msg = File(srcDir ~ "/msg.d", "w");
-        scope (exit)
-            msg.close();
-        msg.write(renderMessage(m.message));
+        if (m.message.messages.length > 0)
+        {
+            auto msg = File(srcDir ~ "/msg.d", "w");
+            scope (exit)
+                msg.close();
+            msg.write(renderMessage(m.message));
+        }
+    }
+
+    public void makePackageAsDependency(Manifest m, string outDir)
+    {
+        auto dir = outDir ~ "/" ~ m.packageName ~ "-" ~ m.version_;
+        makePackage(m, dir);
+        File(dir ~ "/" ~ m.packageName ~ ".lock", "w").close();
     }
 
 }

@@ -2,18 +2,34 @@
 	"authors": [
 		"nonanonno"
 	],
-	"copyright": "Copyright © 2021, nonanonno",
-	"description": "ros2_d examples",
-	"license": "Apache-2.0",
-	"name": "example",
-	"dependencies": {
-		"ros2_d:rcl_bind": "*"
-	},
 	"configurations": [
 		{
 			"name": "rcl_node",
-			"targetType": "executable",
-			"sourcePaths": ["minamoto/rcl_node"]
+			"sourcePaths": [
+				"minamoto/rcl_node"
+			],
+			"targetPath": "bin/",
+			"targetName": "rcl_node",
+			"targetType": "executable"
+		},
+		{
+			"name": "refer_msg",
+			"sourcePaths": [
+				"minamoto/refer_msg"
+			],
+			"targetPath": "bin/",
+			"targetName": "refer_msg",
+			"targetType": "executable"
 		}
-	]
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"std_msgs": ">=0.0.1",
+		"ros2_d": {
+			"path": "../"
+		}
+	},
+	"description": "ros2_d examples",
+	"license": "Apache-2.0",
+	"name": "example"
 }

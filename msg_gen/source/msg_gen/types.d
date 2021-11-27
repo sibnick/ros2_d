@@ -7,6 +7,7 @@
 module msg_gen.types;
 import std.string;
 import std.array;
+import std.typecons;
 
 /// Type representation
 /// - namespaced : e.g. std_msgs.msg.Header
@@ -37,7 +38,7 @@ struct Member
 {
     Type typeName;
     string fieldName;
-    string defaultValue;
+    Nullable!string defaultValue;
 }
 
 struct Structure
@@ -86,7 +87,8 @@ enum OMGToD = [ // @suppress(dscanner.performance.enum_array_literal)
         "uint64": "ulong",
         "float": "float",
         "double": "double",
-        "string": "string",];
+        "string": "string",
+    ];
 
 string toDTypeIfIsPrimitive(string type)
 {

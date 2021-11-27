@@ -14,7 +14,8 @@ ROS2 が生成するメッセージ定義パッケージを入力としてD言�
 ## 使い方
 
 ```shell
-dub run ros2_d:msg_gen -- <path/to/msg_pkg> <outdir>
+# generate dub packages from ros2 message packages under AMENT_PREFIX_PATH
+dub run ros2_d:msg_gen -- <outdir>
 ```
 
 ※ライブラリとしても使うことができる。その場合は [app.d](source/app.d) を参考に。

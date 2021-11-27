@@ -7,7 +7,6 @@
 	"license": "Apache-2.0",
 	"name": "ros2_d",
 	"subPackages": [
-		"./example",
 		"./msg_gen",
 		"./rcl_bind"
 	]

@@ -1,12 +1,14 @@
 Idl:
     Sentence    < (Comment / Include / Module)*
-    Module      < "module" Name "{" (Module / (Verbatim? Struct) / Empty)* "};"
-    Struct      < "struct" Name "{" (Verbatim? Member)* "};"
-    Member      < (ArrayType / Type) Field ";"
+    Module      < "module" Name "{" (Module / (Annotation* Struct) / Empty)* "};"
+    Struct      < "struct" Name "{" GeneralMember* "};"
+    GeneralMember < (ArrayMember / Member) ';'
+    Member      < Annotation* Type Field
+    ArrayMember < Annotation* ArrayType Field
     Include     < "#include" FileName
-    Verbatim    < "@verbatim" '(' VerbContent? (',' VerbContent)* ')'
-    VerbContent < Type '=' Text
-
+    AnnoContent < Type '=' (Text / Number)
+    Annotation    < AnnoType '(' AnnoContent? (',' AnnoContent)* ')'
+    
     Name        <- identifier
     Type        <- (identifier "::" identifier "::")? identifier
     ArrayType   <- "sequence" '<' Type '>'
@@ -14,6 +16,7 @@ Idl:
     Empty       <- eps
     FileName    <- StringLiteral
     Text        < StringLiteral StringLiteral*
+    AnnoType  <- '@' identifier
 
     Comment <~ "//" (!endOfLine .)* endOfLine
     StringLiteral <~ doublequote (DQChar)* doublequote
@@ -24,3 +27,11 @@ Idl:
                                 / backslash
                                 / [abfnrtv]
                                 )
+
+    Scientific <~ Floating ( ('e' / 'E' ) Integer )?
+    Floating   <~ Integer ('.' Unsigned )?
+    Unsigned   <~ [0-9]+
+    Integer    <~ Sign? Unsigned
+    Binary     <~ "0b" [01] [01_]*
+    Sign       <- '-' / '+'
+    Number  <- (Binary / Scientific)

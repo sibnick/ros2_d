@@ -1,8 +1,8 @@
 {
     "version": "1.0.0",
-    "description": "std_msgs for Dlang",
+    "description": "test_msgs for Dlang",
     "license": "Apache-2.0",
-    "name": "std_msgs",
+    "name": "test_msgs",
     "configurations": [
         {
             "name": "library",
@@ -10,7 +10,7 @@
         }
     ],
     "dependencies": {
-        "builtin_interfaces": "~>1.0.0",
-        "rcl_bind": "~>0.0.1"
+        "builtin_interfaces": "*",
+        "ros2_d:rcl_bind": "*"
     }
 }
