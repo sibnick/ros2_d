@@ -15,6 +15,7 @@ struct Manifest
     string packageName;
     MessageModule message;
     string version_;
+    string installDirectory;
 
     bool hasMessages() const
     {

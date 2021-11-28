@@ -87,7 +87,6 @@ enum OMGToD = [ // @suppress(dscanner.performance.enum_array_literal)
         "uint64": "ulong",
         "float": "float",
         "double": "double",
-        "string": "string",
     ];
 
 string toDTypeIfIsPrimitive(string type)
@@ -105,4 +104,46 @@ string toDTypeIfIsPrimitive(string type)
 bool isPrimitive(string typeName)
 {
     return cast(bool)(typeName in OMGToD);
+}
+
+enum DToC = [ // @suppress(dscanner.performance.enum_array_literal)
+        "bool": "bool",
+        "byte": "int8",
+        "ubyte": "uint8",
+        "short": "int16",
+        "ushort": "uint16",
+        "int": "int32",
+        "uint": "uint32",
+        "long": "int64",
+        "ulong": "uint64",
+        "float": "float",
+        "double": "double",
+    ];
+
+string toC(Type type_)
+{
+    if (type_.isArray)
+    {
+        if (type_.namespaced in DToC)
+        {
+            return "rosidl_runtime_c__" ~ DToC[type_.namespaced] ~ "__Sequence";
+        }
+        if (type_.namespaced == "string")
+        {
+            return "rosidl_runtime_c__String__Sequence";
+        }
+        return type_.namespaced.replace(".", "__") ~ "__Sequence";
+    }
+    else
+    {
+        if (type_.namespaced in DToC)
+        {
+            return type_.namespaced;
+        }
+        if (type_.namespaced == "string")
+        {
+            return "rosidl_runtime_c__String";
+        }
+        return type_.namespaced.replace(".", "__");
+    }
 }

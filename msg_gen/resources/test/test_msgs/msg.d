@@ -1,6 +1,9 @@
 // dfmt off
 module test_msgs.msg;
 
+import std.string;
+import std.utf;
+import test_msgs.c.msg;
 import builtin_interfaces.msg;
 
 struct StandAlone

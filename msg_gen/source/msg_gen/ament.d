@@ -30,6 +30,7 @@ Manifest[] findMessagePackages(string amentPrefix)
     foreach (p; pkgDirs)
     {
         auto m = loadROS2Package(p);
+        m.installDirectory = amentPrefix;
         if (m.hasMessages())
         {
             pkgs ~= m;

@@ -14,5 +14,12 @@
         "{{name}}": "*",
         {{/depends}}
         "ros2_d:rcl_bind": "*"
-    }
+    },
+    "lflags": [
+        "-L{{installDirectory}}/lib"
+    ],
+    "libs": [
+        "{{package_name}}__rosidl_typesupport_c",
+        "{{package_name}}__rosidl_generator_c"
+    ]
 }

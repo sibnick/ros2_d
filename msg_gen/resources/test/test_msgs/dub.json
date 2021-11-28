@@ -12,5 +12,12 @@
     "dependencies": {
         "builtin_interfaces": "*",
         "ros2_d:rcl_bind": "*"
-    }
+    },
+    "lflags": [
+        "-Linstall/test_msgs/lib"
+    ],
+    "libs": [
+        "test_msgs__rosidl_typesupport_c",
+        "test_msgs__rosidl_generator_c"
+    ]
 }
