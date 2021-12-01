@@ -3,6 +3,7 @@ module {{moduleName}};
 
 import std.string;
 import std.utf;
+import rcl;
 import {{cModuleName}};
 {{#depends}}
 import {{name}};
@@ -13,5 +14,65 @@ struct {{name}}
     {{#members}}
     {{type}} {{name}}{{#default?}} = {{{value}}}{{/default?}};
     {{/members}}
+
+    alias CType = {{cName}};
+    alias CArrayType = {{cArrayName}};
+
+    static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
+    {
+        return rosidl_typesupport_c__get_message_type_support_handle__{{cName}}();
+    }
+
+    static CType* createC() @nogc nothrow
+    {
+        return {{cName}}__create();
+    }
+
+    static void destroyC(ref CType * msg) @nogc nothrow
+    {
+        {{cName}}__destroy(msg);
+        msg = null;
+    }
+
+    static CArrayType *createC(size_t size) @nogc nothrow
+    {
+        return {{cArrayName}}__create(size);
+    }
+
+    static destroyC(ref CArrayType * msg) @nogc nothrow
+    {
+        {{cArrayName}}__destroy(msg);
+        msg = null;
+    }
+
+    static convert(in {{name}} src, ref {{name}}.CType dst)
+    {
+        {{#members}}
+        {{#isArray}}
+        {{cType}}__init(&dst.{{name}}, src.{{name}}.length);
+        foreach(i;0U..src.{{name}}.length) {
+            {{{assignDtoC}}};
+        }
+        {{/isArray}}
+        {{^isArray}}
+        {{{assignDtoC}}};
+        {{/isArray}}
+        {{/members}}
+    }
+
+    static convert(in {{name}}.CType src, out {{name}} dst)
+    {
+        {{#members}}
+        {{#isArray}}
+        dst.{{name}}.length = src.{{name}}.size;
+        foreach(i;0U..src.{{name}}.size) {
+            {{{assignCtoD}}};
+        }
+        {{/isArray}}
+        {{^isArray}}
+        {{{assignCtoD}}};
+        {{/isArray}}
+        {{/members}}
+    }
 }
 {{/messages}}

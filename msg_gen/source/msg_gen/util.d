@@ -2,6 +2,8 @@ module msg_gen.util;
 
 import pegged.grammar;
 import std.array;
+import std.algorithm;
+import std.string;
 
 private enum prefix = "Idl.";
 
@@ -45,4 +47,9 @@ ParseTree[] all(string field)(const ParseTree p)
 string getData(const ParseTree p)
 {
     return p.matches.join();
+}
+
+string trimTrailingWhitespace(string text)
+{
+    return text.split('\n').map!(l => l.stripRight(" ")).join('\n');
 }

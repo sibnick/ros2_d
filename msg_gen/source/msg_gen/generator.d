@@ -8,14 +8,66 @@ import std.array;
 import std.file;
 import std.stdio;
 import std.typecons;
+import msg_gen.util;
 
 alias Mustache = MustacheEngine!string;
 alias Context = Mustache.Context;
 
+string createAssignDtoC(in Member member)
+{
+    const type = member.typeName;
+    const isArray = type.isArray;
+    const isString = type.namespaced == "string";
+    const isPrimitive = cast(bool)(type.namespaced in DToC);
+    const field = member.fieldName ~ (isArray ? "[i]" : "");
+    const cField = member.fieldName ~ (isArray ? ".data[i]" : "");
+    if (isString)
+    {
+        return format!"rosidl_runtime_c__String__assign(&dst.%s, toStringz(src.%s))"(cField, field);
+    }
+    else if (isPrimitive)
+    {
+        return format!"dst.%s = src.%s"(cField, field);
+    }
+    else
+    {
+        return format!"%s.convert(src.%s, dst.%s)"(type.namespaced, field, cField);
+    }
+}
+
+string createAssignCtoD(in Member member)
+{
+    const type = member.typeName;
+    const isArray = type.isArray;
+    const isString = type.namespaced == "string";
+    const isPrimitive = cast(bool)(type.namespaced in DToC);
+    const field = member.fieldName ~ (isArray ? "[i]" : "");
+    const cField = member.fieldName ~ (isArray ? ".data[i]" : "");
+    if (isString)
+    {
+        return format!"dst.%s = fromStringz(src.%s.data).dup()"(field, cField);
+    }
+    else if (isPrimitive)
+    {
+        return format!"dst.%s = src.%s"(field, cField);
+    }
+    else
+    {
+        return format!"%s.convert(src.%s, dst.%s)"(type.namespaced, cField, field);
+    }
+}
+
 void insert(Context cxt, Member member)
 {
+    if (member.typeName.isArray)
+    {
+        cxt.useSection("isArray");
+    }
     cxt["type"] = member.typeName.namespaced ~ (member.typeName.isArray ? "[]" : "");
+    cxt["cType"] = toC(member.typeName);
     cxt["name"] = member.fieldName;
+    cxt["assignDtoC"] = createAssignDtoC(member);
+    cxt["assignCtoD"] = createAssignCtoD(member);
     if (!member.defaultValue.isNull)
     {
         cxt["default?"] = ["value": member.defaultValue.get];
@@ -28,9 +80,12 @@ void insertC(Context cxt, Member member)
     cxt["name"] = member.fieldName;
 }
 
-void insert(Context cxt, Structure structure)
+void insert(Context cxt, Structure structure, string namespace_)
 {
+    auto namespaced = namespace_ ~ "." ~ structure.name;
     cxt["name"] = structure.name;
+    cxt["cName"] = toC(Type(namespaced));
+    cxt["cArrayName"] = toC(Type(namespaced, true));
     foreach (m; structure.members)
     {
         cxt.addSubContext("members").insert(m);
@@ -59,7 +114,7 @@ void insert(Context cxt, MessageModule mm)
     }
     foreach (m; mm.messages)
     {
-        cxt.addSubContext("messages").insert(m);
+        cxt.addSubContext("messages").insert(m, mm.name);
     }
 }
 
@@ -88,10 +143,10 @@ class DUBGenerator
     {
         auto cxt = new Mustache.Context();
         cxt.insert(mm);
-        return mustache.renderString(msgTmpl, cxt);
+        return mustache.renderString(msgTmpl, cxt).trimTrailingWhitespace();
     }
 
-    @("msg")
+    @("msg.d")
     unittest
     {
         auto mm = MessageModule("test_msgs.msg", [
@@ -121,7 +176,7 @@ class DUBGenerator
     {
         auto cxt = new Mustache.Context();
         cxt.insertC(mm);
-        return mustache.renderString(msgCTmpl, cxt);
+        return mustache.renderString(msgCTmpl, cxt).trimTrailingWhitespace();
     }
 
     @("msg.c")
@@ -165,7 +220,7 @@ class DUBGenerator
             sub["name"] = d;
         }
 
-        return mustache.renderString(dubTmpl, cxt);
+        return mustache.renderString(dubTmpl, cxt).trimTrailingWhitespace();
     }
 
     @("DUB")
