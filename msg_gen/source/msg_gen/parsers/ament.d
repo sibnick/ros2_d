@@ -1,9 +1,10 @@
-module msg_gen.ament;
+module msg_gen.parsers.ament;
 import std.process;
 import std.stdio;
 import std.string;
 import std.file;
-import msg_gen.manifest;
+import msg_gen.rosidl.manifest;
+import msg_gen.parsers.package_xml;
 
 string[] getAmentPrefix()
 {
@@ -29,7 +30,7 @@ Manifest[] findMessagePackages(string amentPrefix)
     Manifest[] pkgs;
     foreach (p; pkgDirs)
     {
-        auto m = loadROS2Package(p);
+        auto m = parseROS2Package(p);
         m.installDirectory = amentPrefix;
         if (m.hasMessages())
         {

@@ -15,8 +15,6 @@ module test_msgs {
       @default (value=0)
       int32 data2;
 
-      @verbatim (language="comment", text=
-        " comment for member 3")
       @default (value=0.0)
       float data3;
 

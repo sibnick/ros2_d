@@ -12,7 +12,7 @@ nothrow:
 struct test_msgs__msg__StandAlone
 {
     bool data1;
-    int data2;
+    int32_t data2;
     float data3;
     rosidl_runtime_c__String data4;
     rosidl_runtime_c__int32__Sequence array1;

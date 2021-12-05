@@ -53,3 +53,30 @@ string trimTrailingWhitespace(string text)
 {
     return text.split('\n').map!(l => l.stripRight(" ")).join('\n');
 }
+
+string[] formatMatrix(string[][] matrix)
+{
+    import std.format;
+    import std.array;
+    import std.range;
+
+    auto sizes = new ulong[matrix[0].length];
+    foreach (line; matrix)
+    {
+        foreach (i; 0 .. line.length)
+        {
+            sizes[i] = max(sizes[i], line[i].length);
+        }
+    }
+    string[] rslt;
+    foreach (line; matrix)
+    {
+        string[] l;
+        foreach (i; 0 .. line.length)
+        {
+            l ~= format!"%*-s"(sizes[i], line[i]);
+        }
+        rslt ~= l.join(" ");
+    }
+    return rslt;
+}

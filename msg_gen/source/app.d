@@ -1,13 +1,8 @@
 import msg_gen;
-import std.stdio;
-import std.file;
+import jcli;
 
-void main(string[] args)
+int main(string[] args)
 {
-    auto g = new DUBGenerator();
-    auto packages = findMessagePackages();
-    foreach (p; packages)
-    {
-        g.makePackageAsDependency(p, args[1]);
-    }
+    auto executor = new CommandLineInterface!(msg_gen.commands);
+    return executor.parseAndExecute(args);
 }

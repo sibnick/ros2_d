@@ -9,7 +9,7 @@ ROS2 が生成するメッセージ定義パッケージを入力としてD言�
 - msg 定義 : `source/<pkg_name>/msg.d` に全て定義
 - srv 定義 : `source/<pkg_name>/srv.d` に全て定義 (未実装)
 - action 定義 : `source/<pkg_name>/action.d` に全て定義(未実装)
-- 各メッセージ定義の typesupport_c 連携も生成 (未実装)
+- 各メッセージ定義の typesupport_c 連携も生成
 
 ## 使い方
 
@@ -18,4 +18,4 @@ ROS2 が生成するメッセージ定義パッケージを入力としてD言�
 dub run ros2_d:msg_gen -- <outdir>
 ```
 
-※ライブラリとしても使うことができる。その場合は [app.d](source/app.d) を参考に。
+※ライブラリとしても使うことができる。

@@ -16,7 +16,7 @@ function on_exit() {
 trap on_exit EXIT
 
 dub build ros2_d:msg_gen --force
-dub run ros2_d:msg_gen -- .dub/packages
+dub run ros2_d:msg_gen -- .dub/packages -r
 # build
 for c in $configs; do
   dub build -c $c
