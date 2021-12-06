@@ -21,6 +21,7 @@ void run(string cmd)
     else
     {
         stderr.writefln!commandResultFmt(cmd, failed);
+        exit(ret);
     }
 }
 
