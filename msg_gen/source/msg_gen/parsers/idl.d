@@ -178,12 +178,16 @@ class Parser
      * Params:
      *   data = IDL text
      */
-    void consume(string data)
+    bool consume(string data)
     {
         const idl = Idl(data);
         auto impl = new Impl();
         impl.parse(idl);
         byte[string] modules;
+        if (impl.structs.length == 0)
+        {
+            return false;
+        }
         foreach (s; impl.structs)
         {
             const mod = s.namespace;
@@ -194,6 +198,7 @@ class Parser
         {
             messageModules[m].depends ~= impl.depends;
         }
+        return true;
     }
 
     @("one file : StandAlone") unittest

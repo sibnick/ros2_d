@@ -8,6 +8,9 @@ import std.range;
 import std.algorithm;
 import std.file;
 import std.exception;
+import std.experimental.logger;
+import std.format;
+import colorize;
 
 private auto getFirst(string field, R)(DOMEntity!R entity)
 {
@@ -26,9 +29,6 @@ private auto has(string field, R)(DOMEntity!R entity)
 
 Manifest parseROS2Package(string root)
 {
-    import std.stdio;
-    import colorize;
-
     enforce(exists(root ~ "/package.xml"));
     auto m = Manifest();
 
@@ -42,6 +42,8 @@ Manifest parseROS2Package(string root)
         return m;
     }
 
+    tracef("Found message package at %s.", root);
+
     // find msg
     const msgDir = root ~ "/msg";
     if (msgDir.exists)
@@ -49,18 +51,29 @@ Manifest parseROS2Package(string root)
         auto idls = dirEntries(msgDir, "*.idl", SpanMode.shallow);
         auto parser = new Parser();
 
+        // for tracing
+        int idlNum = 0;
+        int processedNum = 0;
         foreach (idl; idls)
         {
-            parser.consume(readText(idl));
+            idlNum++;
+            tracef("Found message %s.", idl);
+            const ret = parser.consume(readText(idl));
+            if (ret)
+            {
+                processedNum++;
+            }
+            warningf(!ret, "Failed to parse %s", idl);
         }
+
+        tracef("%s: Processeced %d of %d msgs.", root, processedNum, idlNum);
         if (parser.messageModules.length == 1)
         {
             m.message = parser.messageModules.values[0];
         }
         else
         {
-            stderr.writefln!"%s: Cannot parse pacakge %s at %s"("Warning".color(fg.yellow), m.packageName.style(
-                    mode.bold), root);
+            warningf("Cannot parse package %s at %s", m.packageName.style(mode.bold), root);
         }
 
     }

@@ -1,18 +1,20 @@
 module msg_gen.parsers.ament;
 import std.process;
-import std.stdio;
 import std.string;
 import std.file;
+import std.experimental.logger;
 import msg_gen.rosidl.manifest;
 import msg_gen.parsers.package_xml;
 
 string[] getAmentPrefix()
 {
+    tracef("AMENT_PREFIX_PATH=%s", environment.get("AMENT_PREFIX_PATH"));
     return environment.get("AMENT_PREFIX_PATH").split(":");
 }
 
 string[] findAmentPackages(string amentPrefix)
 {
+    tracef("Searching %s", amentPrefix);
     string[] pkgs;
     foreach (dir; dirEntries([amentPrefix, "share"].join("/"), SpanMode.shallow))
     {

@@ -7,6 +7,8 @@ import std.stdio;
 import colorize;
 import msg_gen.util;
 import std.conv;
+import std.experimental.logger;
+import msg_gen.logging;
 
 @CommandDefault("Generate DUB dependencies from ROS2 message packages.")
 struct GenerateDUBDependencies
@@ -20,8 +22,15 @@ struct GenerateDUBDependencies
     @ArgNamed("dry_run", "Execute parsing ROS2 message packages without generating DUB.")
     Nullable!bool dry_run;
 
+    @ArgNamed("verbose", "Print verbose log.")
+    Nullable!bool verbose;
+
     int onExecute()
     {
+        const logLevel = verbose.get(false) ? LogLevel.all : LogLevel.info;
+
+        stdThreadLocalLog.logLevel = logLevel;
+
         const manifests = findMessagePackages();
 
         if (dry_run.get(false))
