@@ -1,6 +1,7 @@
 import std.stdio;
 import std_msgs.msg;
 import std_msgs.c.msg;
+import diagnostic_msgs.msg;
 
 void main()
 {
@@ -20,4 +21,7 @@ void main()
     Int32MultiArray e;
     Int32MultiArray.convert(*d, e);
     writeln(e);
+
+    DiagnosticStatus diag;
+    diag.writeln;
 }

@@ -37,6 +37,7 @@ version (unittest)
         {
             enum standAloneIdl = import("test/input/test_msgs/msg/StandAlone.idl");
             enum dependIdl = import("test/input/test_msgs/msg/Depend.idl");
+            enum constantIdl = import("test/input/test_msgs/msg/Constant.idl");
             enum packageXml = import("test/input/test_msgs/package.xml");
         }
         // output
@@ -58,12 +59,19 @@ version (unittest)
                         Member(Type("int32", true), "array1", null_, "\" comment for array member 1\""),
                         Member(Type("int32", true), "array2", "\"(-1, 0, 1)\""),
                         Member(Type("string", true), "array3", "\"('aa', 'bb')\""),
-                    ]);
+                    ],
+                    [],
+                    "\" comment for struct\"\"\\n\"\" newline\"".nullable);
 
             enum depend = Structure("test_msgs::msg::Depend", [
                         Member(Type("builtin_interfaces::msg::Time", false), "stamp"),
                         Member(Type("string", false), "data"),
                     ]);
+
+            enum constant = Structure("test_msgs::msg::Constant",
+                    [Member(Type("uint8", false), "data")],
+                    [Constant(Type("uint8", false), "TEST", "0")]
+                );
 
             enum builtinType = Type("builtin_interfaces::msg::Time", false);
 
@@ -73,6 +81,7 @@ version (unittest)
                         ], [
                             standAlone,
                             depend,
+                            constant,
                         ]));
         }
     }

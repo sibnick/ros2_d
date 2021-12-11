@@ -1,0 +1,11 @@
+module test_msgs {
+  module msg {
+    module Constant_Constants {
+      const uint8 TEST = 0;
+    };
+
+    struct Constant {
+      uint8 data;
+    };
+  };
+};

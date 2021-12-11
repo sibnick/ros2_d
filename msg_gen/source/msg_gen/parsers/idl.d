@@ -42,6 +42,22 @@ string getData(in ParseTree p)
     return p.matches.join();
 }
 
+string getLiteral(in ParseTree p)
+{
+    if (p.has!"Text")
+    {
+        return p.getFirst!"Text".getData;
+    }
+    else if (p.has!"Number")
+    {
+        return p.getFirst!"Number".getData;
+    }
+    else
+    {
+        assert(0);
+    }
+}
+
 public:
 /**
  * IDL parser
@@ -69,6 +85,7 @@ class Parser
 
         Type[] depends;
         Structure[] structs;
+        Constant[][string] constants;
 
         void parseModule(in ParseTree p)
         {
@@ -80,12 +97,32 @@ class Parser
         void parseStruct(in ParseTree p)
         {
             const name = p.getFirst!"Name".getData;
-            const mod = moduleName.array.reverse.join("::");
             const fullname = (moduleName.array.reverse ~ name).join("::");
             struct_.insert(Structure(fullname, []));
+            auto annotations = p.all!"Annotation"
+                .map!(a => parseAnnotation(a));
+            foreach (a; annotations)
+            {
+                if (a.name == "@verbatim" && a.content.get("language", "") == "\"comment\"" && "text" in a
+                    .content)
+                {
+                    struct_.front.comment = a.content["text"].nullable;
+                }
+            }
             p.children.each!(c => parse(c));
             structs ~= struct_.front;
             struct_.removeAny();
+        }
+
+        void parseConstant(in ParseTree p)
+        {
+            const mod = moduleName.array.reverse.join("::");
+            assert(mod.endsWith("_Constants"), mod);
+            const t = p.getFirst!"Type".getData;
+            const f = p.getFirst!"Field".getData;
+            const v = p.getFirst!"AnyLiteral".getLiteral;
+
+            constants.require(moduleName.array.reverse.join("::"), []) ~= Constant(Type(t, false), f, v);
         }
 
         void parseMember(in ParseTree p, bool isArray)
@@ -154,6 +191,9 @@ class Parser
             case tag!"Module":
                 parseModule(p);
                 break;
+            case tag!"Constant":
+                parseConstant(p);
+                break;
             case tag!"Struct":
                 parseStruct(p);
                 break;
@@ -180,6 +220,8 @@ class Parser
      */
     bool consume(string data)
     {
+        import std;
+
         const idl = Idl(data);
         auto impl = new Impl();
         impl.parse(idl);
@@ -193,6 +235,21 @@ class Parser
             const mod = s.namespace;
             modules[mod] = 0;
             messageModules.require(mod, MessageModule(mod, [], [])).messages ~= s;
+        }
+        foreach (m, cs; impl.constants)
+        {
+            const type = m[0 .. $ - "_Constants".length];
+            const mod = type.split("::")[0 .. $ - 1].join("::");
+
+            if (messageModules.require(mod, MessageModule(mod, [], []))
+                .messages.canFind!"a.fullname == b"(type))
+            {
+                messageModules[mod].messages.find!"a.fullname == b"(type).front.constants ~= cs;
+            }
+            else
+            {
+                messageModules[mod].messages ~= Structure(type, [], cs);
+            }
         }
         foreach (m; modules.byKey)
         {
@@ -233,14 +290,35 @@ class Parser
         assert(parser.messageModules.length == 1);
         assert(mod in parser.messageModules);
 
-        const answer = parser.messageModules["test_msgs::msg"];
+        const answer = parser.messageModules[mod];
         const reference = MessageModule(mod, [TestData.Internal.builtinType], [
                 TestData.Internal.depend
             ]);
         assert(answer == reference, answer.to!string);
     }
 
-    @("two files") unittest
+    @("one file : Constant") unittest
+    {
+        import std.conv : to;
+        import msg_gen.test_helper;
+        import std;
+
+        const mod = TestData.packageName ~ "::msg";
+
+        auto parser = new Parser();
+
+        parser.consume(TestData.Input.constantIdl);
+
+        assert(parser.messageModules.length == 1);
+        assert(mod in parser.messageModules);
+        const answer = parser.messageModules[mod];
+        const reference = MessageModule(mod, [], [TestData.Internal.constant]);
+
+        assert(answer == reference, answer.to!string);
+
+    }
+
+    @("multiple files") unittest
     {
         import std.conv : to;
         import msg_gen.test_helper;
@@ -251,6 +329,7 @@ class Parser
 
         parser.consume(TestData.Input.standAloneIdl);
         parser.consume(TestData.Input.dependIdl);
+        parser.consume(TestData.Input.constantIdl);
 
         assert(parser.messageModules.length == 1);
         assert(mod in parser.messageModules);

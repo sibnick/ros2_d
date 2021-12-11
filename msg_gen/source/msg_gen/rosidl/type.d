@@ -223,6 +223,25 @@ struct Member
 }
 
 /**
+ * Constant value representation of IDL
+ */
+struct Constant
+{
+    /**
+     * Type of the field
+     */
+    Type type;
+    /**
+     * Field name
+     */
+    string field;
+    /**
+     * Value as a string
+     */
+    string valueString;
+}
+
+/**
  * Struct representation of IDL
  */
 struct Structure
@@ -235,6 +254,14 @@ struct Structure
      * A list of members
      */
     Member[] members;
+    /**
+     * A list of constants
+     */
+    Constant[] constants;
+    /**
+     * Comment text (optional)
+     */
+    Nullable!string comment;
 
     /**
      * Returns: Short name of the struct (e.g. `std_msgs::msg::Header` -> `Header`)

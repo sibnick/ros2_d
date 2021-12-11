@@ -17,6 +17,7 @@ struct StandAlone
     int[] array2 = [-1, 0, 1];
     string[] array3 = ["aa", "bb"];
 
+
     alias CType = test_msgs__msg__StandAlone;
     alias CArrayType = test_msgs__msg__StandAlone__Sequence;
 
@@ -109,6 +110,7 @@ struct Depend
     builtin_interfaces.msg.Time stamp;
     string data;
 
+
     alias CType = test_msgs__msg__Depend;
     alias CArrayType = test_msgs__msg__Depend__Sequence;
 
@@ -154,6 +156,57 @@ struct Depend
         builtin_interfaces.msg.Time.convert(src.stamp, dst.stamp);
 
         dst.data = fromStringz(src.data.data).dup();
+
+    }
+}
+
+struct Constant
+{
+    ubyte data;
+
+    enum ubyte TEST = 0;
+
+    alias CType = test_msgs__msg__Constant;
+    alias CArrayType = test_msgs__msg__Constant__Sequence;
+
+    static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
+    {
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Constant();
+    }
+
+    static CType* createC() @nogc nothrow
+    {
+        return test_msgs__msg__Constant__create();
+    }
+
+    static void destroyC(ref CType * msg) @nogc nothrow
+    {
+        test_msgs__msg__Constant__destroy(msg);
+        msg = null;
+    }
+
+    static CArrayType *createC(size_t size) @nogc nothrow
+    {
+        return test_msgs__msg__Constant__Sequence__create(size);
+    }
+
+    static destroyC(ref CArrayType * msg) @nogc nothrow
+    {
+        test_msgs__msg__Constant__Sequence__destroy(msg);
+        msg = null;
+    }
+
+    static convert(in Constant src, ref Constant.CType dst)
+    {
+
+        dst.data = src.data;
+
+    }
+
+    static convert(in Constant.CType src, out Constant dst)
+    {
+
+        dst.data = src.data;
 
     }
 }

@@ -70,6 +70,13 @@ void insert(T)(Context!T cxt, in Member member)
     }
 }
 
+void insert(T)(Context!T cxt, in Constant constant)
+{
+    cxt["type"] = constant.type.dToString();
+    cxt["name"] = constant.field;
+    cxt["value"] = castLiteral(constant.valueString);
+}
+
 void insert(T)(Context!T cxt, in Structure struct_)
 {
     cxt["name"] = struct_.shortName;
@@ -78,6 +85,10 @@ void insert(T)(Context!T cxt, in Structure struct_)
     foreach (m; struct_.members)
     {
         cxt.addSubContext("members").insert!T(m);
+    }
+    foreach (c; struct_.constants)
+    {
+        cxt.addSubContext("constants").insert!T(c);
     }
 }
 

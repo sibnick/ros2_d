@@ -15,6 +15,10 @@ struct {{name}}
     {{type}} {{name}}{{#default?}} = {{{value}}}{{/default?}};
     {{/members}}
 
+    {{#constants}}
+    enum {{type}} {{name}} = {{{value}}};
+    {{/constants}}
+
     alias CType = {{cName}};
     alias CArrayType = {{cArrayName}};
 

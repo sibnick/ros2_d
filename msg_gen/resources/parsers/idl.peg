@@ -1,14 +1,15 @@
 Idl:
     Sentence    < (Comment / Include / Module)*
-    Module      < "module" Name "{" (Module / (Annotation* Struct) / Empty)* "};"
-    Struct      < "struct" Name "{" GeneralMember* "};"
+    Module      < "module" Name "{" (Module / Struct / Constant / Empty)* "};"
+    Struct      < Annotation* "struct" Name "{" GeneralMember* "};"
     GeneralMember < (ArrayMember / Member) ';'
     Member      < Annotation* Type Field
     ArrayMember < Annotation* ArrayType Field
     Include     < "#include" FileName
     AnnoContent < Type '=' (Text / Number)
     Annotation    < AnnoType '(' AnnoContent? (',' AnnoContent)* ')'
-    
+    Constant    < Annotation* "const" Type Field "=" AnyLiteral ";"
+
     Name        <- identifier
     Type        <- (identifier "::" identifier "::")? identifier
     ArrayType   <- "sequence" '<' Type '>'
@@ -17,6 +18,7 @@ Idl:
     FileName    <- StringLiteral
     Text        < StringLiteral StringLiteral*
     AnnoType  <- '@' identifier
+    AnyLiteral  < (Text / Number)
 
     Comment <~ "//" (!endOfLine .)* endOfLine
     StringLiteral <~ doublequote (DQChar)* doublequote
