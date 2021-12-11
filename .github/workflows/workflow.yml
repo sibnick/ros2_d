@@ -18,23 +18,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros:
-          - foxy
-          - galactic
-          - rolling
+        include:
+          - ros: foxy
+          - ros: galactic
+          - ros: rolling
 
     runs-on: ${{ matrix.ros }}
+    env:
+      ROS_DISTRO: ${{ matrix.ros }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
-      - uses: sergeysova/jq-action@v2
       - name: Run build
         run: |
           rdmd build.d
       - name: Run test
         run: |
-          . /opt/ros/${{ matrix.ros }}/setup.bash
           rdmd test.d

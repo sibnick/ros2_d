@@ -1,4 +1,3 @@
-#!/usr/bin/env rdmd
 import std;
 
 enum workingDir = __FILE_FULL_PATH__.dirName;
@@ -45,8 +44,11 @@ void source(string filename)
 int main()
 {
     source("/opt/ros/$ROS_DISTRO/setup.sh");
-    "dub test ros2_d:msg_gen".run;
-    "rdmd msg_gen/msg_gen_test/test".run;
-    "rdmd example/build".run;
+    scope (exit)
+        "dub remove-local ../../".run;
+    "dub add-local ../..".run;
+    "dub run ros2_d:msg_gen -- .dub/packages -r".run;
+    "dub test".run;
+
     return 0;
 }

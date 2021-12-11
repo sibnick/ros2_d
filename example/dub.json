@@ -25,8 +25,6 @@
 	"copyright": "Copyright © 2021, nonanonno",
 	"dependencies": {
 		"std_msgs": ">=0.0.1",
-		"diagnostic_msgs": ">=0.0.1",
-		"sensor_msgs": ">=0.0.1",
 		"ros2_d": {
 			"path": "../"
 		}

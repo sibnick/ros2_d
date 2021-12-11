@@ -1,9 +1,11 @@
 #!/usr/bin/env rdmd
 import std;
 
+enum workingDir = __FILE_FULL_PATH__.dirName;
+
 void run(string cmd)
 {
-    assert(cmd.spawnShell.wait == 0);
+    assert(spawnShell(cmd, environment.toAA, Config.none, workingDir).wait == 0);
 }
 
 void main()
