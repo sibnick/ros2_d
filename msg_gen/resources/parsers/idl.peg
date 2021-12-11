@@ -1,6 +1,6 @@
 Idl:
     Sentence    < (Comment / Include / Module)*
-    Module      < "module" Name "{" (Module / Struct / Constant / Empty)* "};"
+    Module      < "module" Name "{" (Module / Struct / Constant / Typedef / Empty)* "};"
     Struct      < Annotation* "struct" Name "{" GeneralMember* "};"
     GeneralMember < (ArrayMember / Member) ';'
     Member      < Annotation* Type Field
@@ -9,11 +9,13 @@ Idl:
     AnnoContent < Type '=' (Text / Number)
     Annotation    < AnnoType '(' AnnoContent? (',' AnnoContent)* ')'
     Constant    < Annotation* "const" Type Field "=" AnyLiteral ";"
+    Typedef     < Annotation* "typedef" Type ArrayField ";"
 
     Name        <- identifier
     Type        <- (identifier "::" identifier "::")? identifier
     ArrayType   <- "sequence" '<' Type '>'
     Field       <- identifier
+    ArrayField  <- Field '[' Unsigned ']'
     Empty       <- eps
     FileName    <- StringLiteral
     Text        < StringLiteral StringLiteral*

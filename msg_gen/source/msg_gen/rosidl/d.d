@@ -36,7 +36,11 @@ string toString(Type t)
         tmp = t.fullname.replace("::", ".");
         break;
     }
-    return tmp ~ (t.isArray ? "[]" : "");
+    if (t.isArray)
+    {
+        tmp ~= t.size == 0 ? "[]" : format!"[%d]"(t.size);
+    }
+    return tmp;
 }
 
 string castLiteral(string idl_literal)

@@ -38,6 +38,7 @@ version (unittest)
             enum standAloneIdl = import("test/input/test_msgs/msg/StandAlone.idl");
             enum dependIdl = import("test/input/test_msgs/msg/Depend.idl");
             enum constantIdl = import("test/input/test_msgs/msg/Constant.idl");
+            enum fixedArrayIdl = import("test/input/test_msgs/msg/FixedArray.idl");
             enum packageXml = import("test/input/test_msgs/package.xml");
         }
         // output
@@ -72,6 +73,9 @@ version (unittest)
                     [Member(Type("uint8", false), "data")],
                     [Constant(Type("uint8", false), "TEST", "0")]
                 );
+            enum fixedArray = Structure("test_msgs::msg::FixedArray",
+                    [Member(Type("double", true, 10), "data")]
+                );
 
             enum builtinType = Type("builtin_interfaces::msg::Time", false);
 
@@ -82,6 +86,7 @@ version (unittest)
                             standAlone,
                             depend,
                             constant,
+                            fixedArray,
                         ]));
         }
     }

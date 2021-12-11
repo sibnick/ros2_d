@@ -19,8 +19,9 @@ template Context(T)
 string createAssignDtoC(in Member member)
 {
     const type = member.type;
-    const dField = member.field ~ (type.isArray ? "[i]" : "");
-    const cField = member.field ~ (type.isArray ? ".data[i]" : "");
+    const dField = member.field ~ (member.type.isArray ? "[i]" : "");
+    const cField = member.field ~ (member.type.isDynamicArray ? ".data[i]" : member.type.isFixedArray ? "[i]"
+            : "");
 
     final switch (type.kind)
     {
@@ -36,8 +37,9 @@ string createAssignDtoC(in Member member)
 string createAssignCtoD(in Member member)
 {
     const type = member.type;
-    const dField = member.field ~ (type.isArray ? "[i]" : "");
-    const cField = member.field ~ (type.isArray ? ".data[i]" : "");
+    const dField = member.field ~ (member.type.isArray ? "[i]" : "");
+    const cField = member.field ~ (member.type.isDynamicArray ? ".data[i]" : member.type.isFixedArray ? "[i]"
+            : "");
 
     final switch (type.kind)
     {
@@ -56,6 +58,10 @@ void insert(T)(Context!T cxt, in Member member)
     if (member.type.isArray)
     {
         cxt.useSection("isArray");
+    }
+    if (member.type.isDynamicArray)
+    {
+        cxt.useSection("isDynamicArray");
     }
     cxt["type"] = member.type.dToString();
     cxt["cType"] = member.type.cToString();
@@ -99,6 +105,7 @@ void insert(T)(Context!T cxt, in MessageModule mm)
     foreach (d; mm.uniqueDependModules)
     {
         cxt.addSubContext("depends")["name"] = d.replace("::", ".");
+        cxt.addSubContext("cDepends")["name"] = d.replace("::", ".c.");
     }
     foreach (m; mm.messages)
     {

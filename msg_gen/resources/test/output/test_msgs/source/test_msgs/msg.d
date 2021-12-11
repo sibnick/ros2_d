@@ -7,6 +7,8 @@ import rcl;
 import test_msgs.c.msg;
 import builtin_interfaces.msg;
 
+import builtin_interfaces.c.msg;
+
 struct StandAlone
 {
     bool data1;
@@ -51,11 +53,15 @@ struct StandAlone
     static convert(in StandAlone src, ref StandAlone.CType dst)
     {
 
+
         dst.data1 = src.data1;
+
 
         dst.data2 = src.data2;
 
+
         dst.data3 = src.data3;
+
 
         rosidl_runtime_c__String__assign(&dst.data4, toStringz(src.data4));
 
@@ -79,26 +85,30 @@ struct StandAlone
     static convert(in StandAlone.CType src, out StandAlone dst)
     {
 
+
         dst.data1 = src.data1;
+
 
         dst.data2 = src.data2;
 
+
         dst.data3 = src.data3;
+
 
         dst.data4 = fromStringz(src.data4.data).dup();
 
         dst.array1.length = src.array1.size;
-        foreach(i;0U..src.array1.size) {
+        foreach(i;0U..dst.array1.length) {
             dst.array1[i] = src.array1.data[i];
         }
 
         dst.array2.length = src.array2.size;
-        foreach(i;0U..src.array2.size) {
+        foreach(i;0U..dst.array2.length) {
             dst.array2[i] = src.array2.data[i];
         }
 
         dst.array3.length = src.array3.size;
-        foreach(i;0U..src.array3.size) {
+        foreach(i;0U..dst.array3.length) {
             dst.array3[i] = fromStringz(src.array3.data[i].data).dup();
         }
 
@@ -144,7 +154,9 @@ struct Depend
     static convert(in Depend src, ref Depend.CType dst)
     {
 
+
         builtin_interfaces.msg.Time.convert(src.stamp, dst.stamp);
+
 
         rosidl_runtime_c__String__assign(&dst.data, toStringz(src.data));
 
@@ -153,7 +165,9 @@ struct Depend
     static convert(in Depend.CType src, out Depend dst)
     {
 
+
         builtin_interfaces.msg.Time.convert(src.stamp, dst.stamp);
+
 
         dst.data = fromStringz(src.data.data).dup();
 
@@ -199,6 +213,7 @@ struct Constant
     static convert(in Constant src, ref Constant.CType dst)
     {
 
+
         dst.data = src.data;
 
     }
@@ -206,7 +221,62 @@ struct Constant
     static convert(in Constant.CType src, out Constant dst)
     {
 
+
         dst.data = src.data;
+
+    }
+}
+
+struct FixedArray
+{
+    double[10] data;
+
+
+    alias CType = test_msgs__msg__FixedArray;
+    alias CArrayType = test_msgs__msg__FixedArray__Sequence;
+
+    static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
+    {
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__FixedArray();
+    }
+
+    static CType* createC() @nogc nothrow
+    {
+        return test_msgs__msg__FixedArray__create();
+    }
+
+    static void destroyC(ref CType * msg) @nogc nothrow
+    {
+        test_msgs__msg__FixedArray__destroy(msg);
+        msg = null;
+    }
+
+    static CArrayType *createC(size_t size) @nogc nothrow
+    {
+        return test_msgs__msg__FixedArray__Sequence__create(size);
+    }
+
+    static destroyC(ref CArrayType * msg) @nogc nothrow
+    {
+        test_msgs__msg__FixedArray__Sequence__destroy(msg);
+        msg = null;
+    }
+
+    static convert(in FixedArray src, ref FixedArray.CType dst)
+    {
+
+        foreach(i;0U..src.data.length) {
+            dst.data[i] = src.data[i];
+        }
+
+    }
+
+    static convert(in FixedArray.CType src, out FixedArray dst)
+    {
+
+        foreach(i;0U..dst.data.length) {
+            dst.data[i] = src.data[i];
+        }
 
     }
 }

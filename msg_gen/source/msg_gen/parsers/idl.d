@@ -4,6 +4,7 @@ import std.algorithm;
 import std.array;
 import std.typecons;
 import std.container : SList;
+import std.conv : to;
 import pegged.grammar;
 import msg_gen.rosidl.type;
 
@@ -86,6 +87,7 @@ class Parser
         Type[] depends;
         Structure[] structs;
         Constant[][string] constants;
+        Type[string] typedefMap;
 
         void parseModule(in ParseTree p)
         {
@@ -125,6 +127,20 @@ class Parser
             constants.require(moduleName.array.reverse.join("::"), []) ~= Constant(Type(t, false), f, v);
         }
 
+        void parseTypedef(in ParseTree p)
+        {
+            const t = p.getFirst!"Type".getData;
+            const f = p.getFirst!"ArrayField"
+                .getFirst!"Field"
+                .getData;
+            const s = p.getFirst!"ArrayField"
+                .getFirst!"Unsigned"
+                .getData
+                .to!int;
+
+            typedefMap[f] = Type(t, true, s);
+        }
+
         void parseMember(in ParseTree p, bool isArray)
         {
             const type = isArray ? p.getFirst!"ArrayType"
@@ -154,7 +170,9 @@ class Parser
                 }
             }
 
-            const member = Member(Type(type, isArray), field, defaultText, comment);
+            const solvedType = typedefMap.get(type, Type(type, isArray));
+
+            const member = Member(solvedType, field, defaultText, comment);
             struct_.front.members ~= member;
         }
 
@@ -193,6 +211,9 @@ class Parser
                 break;
             case tag!"Constant":
                 parseConstant(p);
+                break;
+            case tag!"Typedef":
+                parseTypedef(p);
                 break;
             case tag!"Struct":
                 parseStruct(p);
@@ -301,7 +322,6 @@ class Parser
     {
         import std.conv : to;
         import msg_gen.test_helper;
-        import std;
 
         const mod = TestData.packageName ~ "::msg";
 
@@ -318,6 +338,25 @@ class Parser
 
     }
 
+    @("one file : FixedArray") unittest
+    {
+        import std.conv : to;
+        import msg_gen.test_helper;
+
+        const mod = TestData.packageName ~ "::msg";
+
+        auto parser = new Parser();
+
+        parser.consume(TestData.Input.fixedArrayIdl);
+
+        assert(parser.messageModules.length == 1);
+        assert(mod in parser.messageModules);
+        const answer = parser.messageModules[mod];
+        const reference = MessageModule(mod, [], [TestData.Internal.fixedArray]);
+
+        assert(answer == reference, answer.to!string);
+    }
+
     @("multiple files") unittest
     {
         import std.conv : to;
@@ -330,6 +369,7 @@ class Parser
         parser.consume(TestData.Input.standAloneIdl);
         parser.consume(TestData.Input.dependIdl);
         parser.consume(TestData.Input.constantIdl);
+        parser.consume(TestData.Input.fixedArrayIdl);
 
         assert(parser.messageModules.length == 1);
         assert(mod in parser.messageModules);

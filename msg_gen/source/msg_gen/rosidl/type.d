@@ -63,6 +63,12 @@ struct Type
     bool isArray;
 
     /**
+     * Size of fixed array (if isArray).
+     * 0 means this is a dynamic array.
+     */
+    int size;
+
+    /**
      * Returns: Type kind of the type by seeing `fullname` text
      */
     Kind kind() const @property
@@ -79,6 +85,16 @@ struct Type
         {
             return Kind.nested;
         }
+    }
+
+    bool isDynamicArray() const @property
+    {
+        return isArray && size == 0;
+    }
+
+    bool isFixedArray() const @property
+    {
+        return isArray && size != 0;
     }
 
     /**

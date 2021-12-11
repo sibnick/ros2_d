@@ -8,6 +8,9 @@ import {{cModuleName}};
 {{#depends}}
 import {{name}};
 {{/depends}}
+{{#cDepends}}
+import {{name}};
+{{/cDepends}}
 {{#messages}}
 struct {{name}}
 {
@@ -52,8 +55,9 @@ struct {{name}}
     static convert(in {{name}} src, ref {{name}}.CType dst)
     {
         {{#members}}
+        {{#isDynamicArray}}
+        {{cType}}__init(&dst.{{name}}, src.{{name}}.length);{{/isDynamicArray}}
         {{#isArray}}
-        {{cType}}__init(&dst.{{name}}, src.{{name}}.length);
         foreach(i;0U..src.{{name}}.length) {
             {{{assignDtoC}}};
         }
@@ -67,9 +71,10 @@ struct {{name}}
     static convert(in {{name}}.CType src, out {{name}} dst)
     {
         {{#members}}
+        {{#isDynamicArray}}
+        dst.{{name}}.length = src.{{name}}.size;{{/isDynamicArray}}
         {{#isArray}}
-        dst.{{name}}.length = src.{{name}}.size;
-        foreach(i;0U..src.{{name}}.size) {
+        foreach(i;0U..dst.{{name}}.length) {
             {{{assignCtoD}}};
         }
         {{/isArray}}

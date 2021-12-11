@@ -2,6 +2,7 @@ import std.stdio;
 import std_msgs.msg;
 import std_msgs.c.msg;
 import diagnostic_msgs.msg;
+import sensor_msgs.msg;
 
 void main()
 {
@@ -24,4 +25,14 @@ void main()
 
     DiagnosticStatus diag;
     diag.writeln;
+
+    CameraInfo cameraInfo;
+    auto cCameraInfo = cameraInfo.createC();
+    scope (exit)
+    {
+        cameraInfo.destroyC(cCameraInfo);
+    }
+    cameraInfo.convert(cameraInfo, *cCameraInfo);
+    cameraInfo.convert(*cCameraInfo, cameraInfo);
+
 }

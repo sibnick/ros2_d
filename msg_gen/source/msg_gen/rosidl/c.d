@@ -32,7 +32,7 @@ enum basicIDLToC = [ // @suppress(dscanner.performance.enum_array_literal)
  */
 string toString(Type t)
 {
-    if (t.isArray)
+    if (t.isArray && t.size == 0)
     {
         final switch (t.kind)
         {
@@ -43,6 +43,19 @@ string toString(Type t)
         case Type.Kind.nested:
             assert(t.isNamespaced);
             return t.fullname.replace("::", "__") ~ "__Sequence";
+        }
+    }
+    else if (t.isArray && t.size != 0)
+    {
+        final switch (t.kind)
+        {
+        case Type.Kind.primitive:
+            return basicIDLToC[t.fullname] ~ format!"[%d]"(t.size);
+        case Type.Kind.string_:
+            return "rosidl_runtime_c__String" ~ format!"[%d]"(t.size);
+        case Type.Kind.nested:
+            assert(t.isNamespaced);
+            return t.fullname.replace("::", "__") ~ format!"[%d]"(t.size);
         }
     }
     else
