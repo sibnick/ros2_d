@@ -34,7 +34,11 @@ jobs:
           compiler: dmd-latest
       - name: Run build
         run: |
-          rdmd build.d
+          rdmd script/build
       - name: Run test
         run: |
-          rdmd test.d
+          rdmd script/test
+      - name: Build example
+        run: |
+          . /opt/ros/$ROS_DISTRO/setup.sh
+          rdmd example/build

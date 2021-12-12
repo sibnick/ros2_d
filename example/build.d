@@ -14,7 +14,7 @@ void run(string cmd)
     assert(ret == 0, format!"Returns %d"(ret));
 }
 
-string runAndGet(string cmd)
+string exec(string cmd)
 {
     writeln(cmd);
     const ret = executeShell(cmd, environment.toAA, Config.none, size_t.max, workingDir);
@@ -24,14 +24,11 @@ string runAndGet(string cmd)
 
 void main()
 {
-    "dub add-local ..".run;
-    scope (exit)
-        "dub remove-local ..".run;
-    "dub run ros2_d:msg_gen -- .dub/packages -r".run;
-    const manifest = "cat dub.json".runAndGet.parseJSON;
-    const configs = manifest["configurations"].array.map!(c => c["name"].str).array;
-    foreach (c; configs)
-    {
-        format!"dub build -c %s"(c).run;
-    }
+    "dub run --root .. ros2_d:msg_gen -- .dub/packages -r".run;
+    "cat dub.json"
+        .exec
+        .parseJSON["configurations"]
+        .array
+        .map!(c => c["name"].str)
+        .each!(c => format!"dub build -c %s"(c).run);
 }
