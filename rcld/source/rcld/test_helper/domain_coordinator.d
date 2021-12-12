@@ -74,25 +74,9 @@ version (rolling) @("rolling is here") unittest
 {
 }
 
-@("Choose different domain_id") unittest
+@("choose different domain_id") unittest
 {
     auto a = findVacantDomainID();
     auto b = findVacantDomainID();
     assert(a.id != b.id);
-}
-
-@("Re-pick same domain_id returned") unittest
-{
-    int a_id, b_id;
-    {
-        auto a = findVacantDomainID();
-        a_id = a.id;
-        // Call destructor of a
-    }
-    {
-        auto b = findVacantDomainID();
-        b_id = b.id;
-        // Call destroctor of b
-    }
-    assert(a_id == b_id);
 }
