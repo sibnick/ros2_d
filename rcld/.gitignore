@@ -1,0 +1,7 @@
+.dub
+ros2_d*
+libros2_d*
+*.exe
+*.o
+*.obj
+*.lst

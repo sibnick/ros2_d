@@ -8,6 +8,7 @@
 	"name": "ros2_d",
 	"subPackages": [
 		"./msg_gen",
-		"./rcl_bind"
+		"./rcl_bind",
+		"./rcld"
 	]
 }

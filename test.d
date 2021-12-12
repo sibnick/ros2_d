@@ -1,52 +1,37 @@
 #!/usr/bin/env rdmd
 import std;
+import script.common;
 
 enum workingDir = __FILE_FULL_PATH__.dirName;
+alias run = runImpl!workingDir;
 
-enum reset = "\033[0m";
-enum red = "\033[31m";
-enum green = "\033[32m";
-enum yellow = "\033[33m";
-
-enum commandResultFmt = yellow ~ "%s" ~ reset ~ " : %s";
-enum succeeded = green ~ "suceeded" ~ reset;
-enum failed = red ~ "failed" ~ reset;
-
-void run(string cmd)
+int main(string[] args)
 {
-    const ret = spawnShell(cmd, environment.toAA, Config.none, workingDir).wait;
-    if (ret == 0)
+    source("/opt/ros/$ROS_DISTRO/setup.sh");
+    if (args.length == 1)
     {
-        stderr.writefln!commandResultFmt(cmd, succeeded);
+        "dub test :msg_gen".run;
+        "dub test :rcld".run;
+        "rdmd msg_gen/msg_gen_test/test".run;
+        "rdmd example/build".run;
     }
     else
     {
-        stderr.writefln!commandResultFmt(cmd, failed);
-    }
-    assert(ret == 0, format!"Returns %d"(ret));
-}
-
-void source(string filename)
-{
-    auto env = format!". %s; env -0"(filename).executeShell;
-    assert(env.status == 0);
-    foreach (l; env.output.split("\0"))
-    {
-        auto ll = l.split("=");
-        if (ll.length == 2)
+        switch (args[1])
         {
-            auto key = ll[0];
-            auto value = ll[1];
-            environment[key] = value;
+        case "msg_gen":
+            "dub test :msg_gen".run;
+            "rdmd msg_gen/msg_gen_test/test".run;
+            break;
+        case "example":
+            "rdmd example/build".run;
+            break;
+        case "rcld":
+            "dub test :rcld".run;
+            break;
+        default:
+            break;
         }
     }
-}
-
-int main()
-{
-    source("/opt/ros/$ROS_DISTRO/setup.sh");
-    "dub test ros2_d:msg_gen".run;
-    "rdmd msg_gen/msg_gen_test/test".run;
-    "rdmd example/build".run;
     return 0;
 }
