@@ -3,6 +3,7 @@ module rcld.context;
 import rcl;
 import core.runtime;
 import std.exception;
+import rcld.node;
 
 class Context
 {
@@ -19,6 +20,10 @@ class Context
 
     void shutdown()
     {
+        foreach (node; nodes)
+        {
+            node.terminate();
+        }
         if (context != rcl_context_t())
         {
             rcl_shutdown(&context);
@@ -30,4 +35,6 @@ class Context
 package:
     rcutils_allocator_t allocator;
     rcl_context_t context;
+    Node[] nodes;
+
 }

@@ -8,10 +8,13 @@ import std.exception;
 interface BaseSubscription
 {
     void terminate(Node node);
+    void takeAndCall();
+    rcl_subscription_t* handle() nothrow;
 }
 
 class Subscription(Message) : BaseSubscription
 {
+    alias CallbakT = void delegate(in Message msg);
     this(Node node, in string name)
     {
         subHandle = rcl_get_zero_initialized_subscription();
@@ -46,6 +49,27 @@ class Subscription(Message) : BaseSubscription
         return ret == 0;
     }
 
+    void setCallback(CallbakT callback)
+    {
+        this.callback = callback;
+    }
+
 package:
     rcl_subscription_t subHandle;
+    CallbakT callback;
+public:
+    override void takeAndCall()
+    {
+        auto msg = Message();
+        enforce(take(msg));
+        if (callback)
+        {
+            callback(msg);
+        }
+    }
+
+    override rcl_subscription_t* handle() nothrow
+    {
+        return &subHandle;
+    }
 }

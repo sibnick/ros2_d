@@ -16,6 +16,7 @@ class Node
         scope (exit)
             rcl_node_options_fini(&options);
         enforce(rcl_node_init(&nodeHandle, name.toStringz, namespace.toStringz, &context.context, &options) == 0);
+        context.nodes ~= this;
     }
 
     ~this()
