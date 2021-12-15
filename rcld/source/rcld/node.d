@@ -2,6 +2,7 @@ module rcld.node;
 
 import rcl;
 import rcld.publisher;
+import rcld.subscription;
 import std.string;
 import std.exception;
 import rcld.context;
@@ -29,6 +30,11 @@ class Node
             pub.terminate(this);
         }
         publishers.length = 0;
+        foreach (sub; subscriptions)
+        {
+            sub.terminate(this);
+        }
+        subscriptions.length = 0;
         if (rcl_node_is_valid(&nodeHandle))
         {
             rcl_node_fini(&nodeHandle);
@@ -38,6 +44,7 @@ class Node
 package:
     rcl_node_t nodeHandle;
     BasePublisher[] publishers;
+    BaseSubscription[] subscriptions;
 }
 
 private enum testNamespace = "node_test_ns";
