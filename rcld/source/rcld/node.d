@@ -1,6 +1,7 @@
 module rcld.node;
 
 import rcl;
+import rcld.publisher;
 import std.string;
 import std.exception;
 import rcld.context;
@@ -23,14 +24,20 @@ class Node
 
     void terminate()
     {
+        foreach (pub; publishers)
+        {
+            pub.terminate(this);
+        }
+        publishers.length = 0;
         if (rcl_node_is_valid(&nodeHandle))
         {
             rcl_node_fini(&nodeHandle);
         }
     }
 
-private:
+package:
     rcl_node_t nodeHandle;
+    BasePublisher[] publishers;
 }
 
 private enum testNamespace = "node_test_ns";
