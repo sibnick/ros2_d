@@ -28,7 +28,7 @@ This is a ROS2 client library written in Dlang that does **not** depend on ROS2 
 2. Add ros2_d to your project
 
     ```shell
-    dub add ros2_d
+    dub add ros2_d:rcld
     ```
 
 3. Add message packages you want to use
