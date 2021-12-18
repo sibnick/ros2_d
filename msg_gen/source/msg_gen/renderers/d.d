@@ -29,6 +29,8 @@ string createAssignDtoC(in Member member)
         return format!"dst.%s = src.%s"(cField, dField);
     case Type.Kind.string_:
         return format!"rosidl_runtime_c__String__assign(&dst.%s, toStringz(src.%s))"(cField, dField);
+    case Type.Kind.wstring_:
+        return format!"rosidl_runtime_c__U16String__assign(&dst.%s, cast(const(ushort*))toUTF16z(src.%s))"(cField, dField);
     case Type.Kind.nested:
         return format!"%s.convert(src.%s, dst.%s)"(dToString(type.asPlain), dField, cField);
     }
@@ -47,6 +49,8 @@ string createAssignCtoD(in Member member)
         return format!"dst.%s = src.%s"(dField, cField);
     case Type.Kind.string_:
         return format!"dst.%s = fromStringz(src.%s.data).dup()"(dField, cField);
+    case Type.Kind.wstring_:
+        return format!"dst.%s = fromStringz(cast(const(wchar*))src.%s.data).dup()"(dField, cField);
     case Type.Kind.nested:
         return format!"%s.convert(src.%s, dst.%s)"(dToString(type.asPlain), cField, dField);
     }

@@ -31,6 +31,9 @@ string toString(Type t)
     case Type.Kind.string_:
         tmp = "string";
         break;
+    case Type.Kind.wstring_:
+        tmp = "wstring";
+        break;
     case Type.Kind.nested:
         assert(t.isNamespaced, t.to!string);
         tmp = t.fullname.replace("::", ".");

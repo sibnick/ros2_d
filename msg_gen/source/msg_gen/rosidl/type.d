@@ -45,6 +45,7 @@ struct Type
     {
         primitive,
         string_,
+        wstring_,
         nested
     }
 
@@ -80,6 +81,10 @@ struct Type
         else if (fullname == "string")
         {
             return Kind.string_;
+        }
+        else if (fullname == "wstring")
+        {
+            return Kind.wstring_;
         }
         else
         {
@@ -154,6 +159,7 @@ struct Type
         }
         // Check string
         assert(Type("string", false).kind == Kind.string_);
+        assert(Type("wstring", false).kind == Kind.wstring_);
 
         // Check nested
         assert(Type("Header", false).kind == Kind.nested);

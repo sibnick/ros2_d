@@ -40,6 +40,8 @@ string toString(Type t)
             return format!"rosidl_runtime_c__%s__Sequence"(t.fullname);
         case Type.Kind.string_:
             return "rosidl_runtime_c__String__Sequence";
+        case Type.Kind.wstring_:
+            return "rosidl_runtime_c__U16String__Sequence";
         case Type.Kind.nested:
             assert(t.isNamespaced);
             return t.fullname.replace("::", "__") ~ "__Sequence";
@@ -53,6 +55,8 @@ string toString(Type t)
             return basicIDLToC[t.fullname] ~ format!"[%d]"(t.size);
         case Type.Kind.string_:
             return "rosidl_runtime_c__String" ~ format!"[%d]"(t.size);
+        case Type.Kind.wstring_:
+            return "rosidl_runtime_c__U16String" ~ format!"[%d]"(t.size);
         case Type.Kind.nested:
             assert(t.isNamespaced);
             return t.fullname.replace("::", "__") ~ format!"[%d]"(t.size);
@@ -66,6 +70,8 @@ string toString(Type t)
             return basicIDLToC[t.fullname];
         case Type.Kind.string_:
             return "rosidl_runtime_c__String";
+        case Type.Kind.wstring_:
+            return "rosidl_runtime_c__U16String";
         case Type.Kind.nested:
             assert(t.isNamespaced);
             return t.fullname.replace("::", "__");
@@ -83,6 +89,9 @@ string toString(Type t)
 
     assert(Type("string", false).toString() == "rosidl_runtime_c__String");
     assert(Type("string", true).toString() == "rosidl_runtime_c__String__Sequence");
+
+    assert(Type("wstring", false).toString() == "rosidl_runtime_c__U16String");
+    assert(Type("wstring", true).toString() == "rosidl_runtime_c__U16String__Sequence");
 
     assert(Type("std_msgs::msg::Header", false).toString() == "std_msgs__msg__Header");
     assert(Type("std_msgs::msg::Header", true).toString() == "std_msgs__msg__Header__Sequence");
