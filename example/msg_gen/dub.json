@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"description": "An example package that use generated msgs.",
+	"license": "Apache-2.0",
+	"name": "msg_gen_example",
+	"dependencies": {
+		"std_msgs": "*"
+	}
+}

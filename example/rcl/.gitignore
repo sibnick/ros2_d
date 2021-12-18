@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/rcl_example
+rcl_example.so
+rcl_example.dylib
+rcl_example.dll
+rcl_example.a
+rcl_example.lib
+rcl_example-test-*
+*.exe
+*.o
+*.obj
+*.lst
+dub.selections.json

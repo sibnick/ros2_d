@@ -1,34 +1,45 @@
-#!/usr/bin/env rdmd
-// Before you run this script, you need to `source /opt/ros/$ROS_DISTRO/setup.sh`.
-// And then run `rdmd build`. Every configurations in the `configurations` sections
-// are built respectively.
-
 import std;
 
-enum workingDir = __FILE_FULL_PATH__.dirName;
+enum rootDir = __FILE_FULL_PATH__.dirName;
 
-void run(string cmd)
+void run(string cmd, string workDir = rootDir)
 {
-    writeln(cmd);
-    const ret = spawnShell(cmd, environment.toAA, Config.none, workingDir).wait;
-    assert(ret == 0, format!"Returns %d"(ret));
+    assert(spawnShell(cmd, environment.toAA, Config.none, workDir).wait == 0);
 }
 
-string exec(string cmd)
+string exec(string cmd, string workDir = rootDir)
 {
-    writeln(cmd);
-    const ret = executeShell(cmd, environment.toAA, Config.none, size_t.max, workingDir);
-    assert(ret.status == 0, format!"Returns %d"(ret.status));
-    return ret.output;
+    const ret = executeShell(cmd, environment.toAA, Config.none, size_t.max, workDir);
+    assert(ret.status == 0);
+    return ret.output.strip;
 }
 
-void main()
+void build(string subDir)
 {
-    "dub run --root .. ros2_d:msg_gen -- .dub/packages -r".run;
-    "cat dub.json"
-        .exec
-        .parseJSON["configurations"]
-        .array
-        .map!(c => c["name"].str)
-        .each!(c => format!"dub build -c %s"(c).run);
+    writefln!"\033[32m>> Building %s\033[0m"(subDir);
+    const dir = buildPath(rootDir, subDir);
+    if (buildPath(dir, "setup.d").exists)
+    {
+        "rdmd setup".run(dir);
+    }
+    if (buildPath(dir, "build.d").exists)
+    {
+        "rdmd build".run(dir);
+    }
+    else
+    {
+        "dub build".run(dir);
+    }
+}
+
+void main(string[] args)
+{
+    if (args.length > 1)
+    {
+        build(args[1]);
+    }
+    else
+    {
+        "ls | grep -v build.d".exec.split("\n").each!(p => build(p));
+    }
 }

@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"ros2_d:rcl_bind": "~>0.1.1"
+	},
+	"description": "A rcl example package",
+	"license": "Apache-2.0",
+	"name": "rcl_example"
+}

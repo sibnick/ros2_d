@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/msg_gen_example
+msg_gen_example.so
+msg_gen_example.dylib
+msg_gen_example.dll
+msg_gen_example.a
+msg_gen_example.lib
+msg_gen_example-test-*
+*.exe
+*.o
+*.obj
+*.lst
+dub.selections.json

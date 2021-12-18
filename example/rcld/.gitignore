@@ -1,0 +1,17 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/rcld_example
+rcld_example.so
+rcld_example.dylib
+rcld_example.dll
+rcld_example.a
+rcld_example.lib
+rcld_example-test-*
+*.exe
+*.o
+*.obj
+*.lst
+dub.selections.json
+bin

@@ -1,0 +1,33 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"ros2_d:rcld": "~>0.1.1",
+		"std_msgs": "*"
+	},
+	"description": "A rcld example.",
+	"license": "Apache-2.0",
+	"name": "rcld_example",
+	"configurations": [
+		{
+			"name": "talker",
+			"sourcePaths": [
+				"fugen/talker"
+			],
+			"targetPath": "bin/",
+			"targetName": "talker",
+			"targetType": "executable"
+		},
+		{
+			"name": "listener",
+			"sourcePaths": [
+				"fugen/listener"
+			],
+			"targetPath": "bin/",
+			"targetName": "listener",
+			"targetType": "executable"
+		}
+	]
+}
