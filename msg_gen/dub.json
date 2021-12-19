@@ -16,5 +16,17 @@
 	"name": "msg_gen",
 	"stringImportPaths": [
 		"resources"
+	],
+	"configurations": [
+		{
+			"name": "executable",
+			"targetType": "executable"
+		},
+		{
+			"name": "unittest",
+			"dependencies": {
+				"ros2_d:test_helper": "*"
+			}
+		}
 	]
 }

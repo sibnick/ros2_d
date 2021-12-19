@@ -5,278 +5,574 @@ import std.string;
 import std.utf;
 import rcl;
 import test_msgs.c.msg;
-import builtin_interfaces.msg;
 
-import builtin_interfaces.c.msg;
-
-struct StandAlone
+struct Arrays
 {
-    bool data1;
-    int data2 = 0;
-    float data3 = 0.0;
-    string data4 = "hello";
-    int[] array1;
-    int[] array2 = [-1, 0, 1];
-    string[] array3 = ["aa", "bb"];
+    bool[3] bool_values;
+    byte[3] byte_values;
+    ubyte[3] char_values;
+    float[3] float32_values;
+    double[3] float64_values;
+    byte[3] int8_values;
+    ubyte[3] uint8_values;
+    short[3] int16_values;
+    ushort[3] uint16_values;
+    int[3] int32_values;
+    uint[3] uint32_values;
+    long[3] int64_values;
+    ulong[3] uint64_values;
+    string[3] string_values;
+    test_msgs.msg.BasicTypes[3] basic_types_values;
+    test_msgs.msg.Constants[3] constants_values;
+    test_msgs.msg.Defaults[3] defaults_values;
+    bool[3] bool_values = [False, True, False];
+    byte[3] byte_values = [0, 1, 255];
+    ubyte[3] char_values = [0, 1, 127];
+    float[3] float32_values = [1.125, 0.0, -1.125];
+    double[3] float64_values = [3.1415, 0.0, -3.1415];
+    byte[3] int8_values = [0, 127, -128];
+    ubyte[3] uint8_values = [0, 1, 255];
+    short[3] int16_values = [0, 32767, -32768];
+    ushort[3] uint16_values = [0, 1, 65535];
+    int[3] int32_values = [0, 2147483647, -2147483648];
+    uint[3] uint32_values = [0, 1, 4294967295];
+    long[3] int64_values = [0, 9223372036854775807, -9223372036854775808];
+    ulong[3] uint64_values = [0, 1, 18446744073709551615];
+    string[3] string_values = ["", "max value", "min value"];
+    int alighment_check;
 
 
-    alias CType = test_msgs__msg__StandAlone;
-    alias CArrayType = test_msgs__msg__StandAlone__Sequence;
+    alias CType = test_msgs__msg__Arrays;
+    alias CArrayType = test_msgs__msg__Arrays__Sequence;
 
     static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
     {
-        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__StandAlone();
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Arrays();
     }
 
     static CType* createC() @nogc nothrow
     {
-        return test_msgs__msg__StandAlone__create();
+        return test_msgs__msg__Arrays__create();
     }
 
     static void destroyC(ref CType * msg) @nogc nothrow
     {
-        test_msgs__msg__StandAlone__destroy(msg);
+        test_msgs__msg__Arrays__destroy(msg);
         msg = null;
     }
 
     static CArrayType *createC(size_t size) @nogc nothrow
     {
-        return test_msgs__msg__StandAlone__Sequence__create(size);
+        return test_msgs__msg__Arrays__Sequence__create(size);
     }
 
     static destroyC(ref CArrayType * msg) @nogc nothrow
     {
-        test_msgs__msg__StandAlone__Sequence__destroy(msg);
+        test_msgs__msg__Arrays__Sequence__destroy(msg);
         msg = null;
     }
 
-    static convert(in StandAlone src, ref StandAlone.CType dst)
+    static convert(in Arrays src, ref Arrays.CType dst)
     {
 
-
-        dst.data1 = src.data1;
-
-
-        dst.data2 = src.data2;
-
-
-        dst.data3 = src.data3;
-
-
-        rosidl_runtime_c__String__assign(&dst.data4, toStringz(src.data4));
-
-        rosidl_runtime_c__int32__Sequence__init(&dst.array1, src.array1.length);
-        foreach(i;0U..src.array1.length) {
-            dst.array1.data[i] = src.array1[i];
+        foreach(i;0U..src.bool_values.length) {
+            dst.bool_values[i] = src.bool_values[i];
         }
 
-        rosidl_runtime_c__int32__Sequence__init(&dst.array2, src.array2.length);
-        foreach(i;0U..src.array2.length) {
-            dst.array2.data[i] = src.array2[i];
+        foreach(i;0U..src.byte_values.length) {
+            dst.byte_values[i] = src.byte_values[i];
         }
 
-        rosidl_runtime_c__String__Sequence__init(&dst.array3, src.array3.length);
-        foreach(i;0U..src.array3.length) {
-            rosidl_runtime_c__String__assign(&dst.array3.data[i], toStringz(src.array3[i]));
+        foreach(i;0U..src.char_values.length) {
+            dst.char_values[i] = src.char_values[i];
         }
+
+        foreach(i;0U..src.float32_values.length) {
+            dst.float32_values[i] = src.float32_values[i];
+        }
+
+        foreach(i;0U..src.float64_values.length) {
+            dst.float64_values[i] = src.float64_values[i];
+        }
+
+        foreach(i;0U..src.int8_values.length) {
+            dst.int8_values[i] = src.int8_values[i];
+        }
+
+        foreach(i;0U..src.uint8_values.length) {
+            dst.uint8_values[i] = src.uint8_values[i];
+        }
+
+        foreach(i;0U..src.int16_values.length) {
+            dst.int16_values[i] = src.int16_values[i];
+        }
+
+        foreach(i;0U..src.uint16_values.length) {
+            dst.uint16_values[i] = src.uint16_values[i];
+        }
+
+        foreach(i;0U..src.int32_values.length) {
+            dst.int32_values[i] = src.int32_values[i];
+        }
+
+        foreach(i;0U..src.uint32_values.length) {
+            dst.uint32_values[i] = src.uint32_values[i];
+        }
+
+        foreach(i;0U..src.int64_values.length) {
+            dst.int64_values[i] = src.int64_values[i];
+        }
+
+        foreach(i;0U..src.uint64_values.length) {
+            dst.uint64_values[i] = src.uint64_values[i];
+        }
+
+        foreach(i;0U..src.string_values.length) {
+            rosidl_runtime_c__String__assign(&dst.string_values[i], toStringz(src.string_values[i]));
+        }
+
+        foreach(i;0U..src.basic_types_values.length) {
+            test_msgs.msg.BasicTypes.convert(src.basic_types_values[i], dst.basic_types_values[i]);
+        }
+
+        foreach(i;0U..src.constants_values.length) {
+            test_msgs.msg.Constants.convert(src.constants_values[i], dst.constants_values[i]);
+        }
+
+        foreach(i;0U..src.defaults_values.length) {
+            test_msgs.msg.Defaults.convert(src.defaults_values[i], dst.defaults_values[i]);
+        }
+
+        foreach(i;0U..src.bool_values.length) {
+            dst.bool_values[i] = src.bool_values[i];
+        }
+
+        foreach(i;0U..src.byte_values.length) {
+            dst.byte_values[i] = src.byte_values[i];
+        }
+
+        foreach(i;0U..src.char_values.length) {
+            dst.char_values[i] = src.char_values[i];
+        }
+
+        foreach(i;0U..src.float32_values.length) {
+            dst.float32_values[i] = src.float32_values[i];
+        }
+
+        foreach(i;0U..src.float64_values.length) {
+            dst.float64_values[i] = src.float64_values[i];
+        }
+
+        foreach(i;0U..src.int8_values.length) {
+            dst.int8_values[i] = src.int8_values[i];
+        }
+
+        foreach(i;0U..src.uint8_values.length) {
+            dst.uint8_values[i] = src.uint8_values[i];
+        }
+
+        foreach(i;0U..src.int16_values.length) {
+            dst.int16_values[i] = src.int16_values[i];
+        }
+
+        foreach(i;0U..src.uint16_values.length) {
+            dst.uint16_values[i] = src.uint16_values[i];
+        }
+
+        foreach(i;0U..src.int32_values.length) {
+            dst.int32_values[i] = src.int32_values[i];
+        }
+
+        foreach(i;0U..src.uint32_values.length) {
+            dst.uint32_values[i] = src.uint32_values[i];
+        }
+
+        foreach(i;0U..src.int64_values.length) {
+            dst.int64_values[i] = src.int64_values[i];
+        }
+
+        foreach(i;0U..src.uint64_values.length) {
+            dst.uint64_values[i] = src.uint64_values[i];
+        }
+
+        foreach(i;0U..src.string_values.length) {
+            rosidl_runtime_c__String__assign(&dst.string_values[i], toStringz(src.string_values[i]));
+        }
+
+
+        dst.alighment_check = src.alighment_check;
 
     }
 
-    static convert(in StandAlone.CType src, out StandAlone dst)
+    static convert(in Arrays.CType src, out Arrays dst)
     {
 
-
-        dst.data1 = src.data1;
-
-
-        dst.data2 = src.data2;
-
-
-        dst.data3 = src.data3;
-
-
-        dst.data4 = fromStringz(src.data4.data).dup();
-
-        dst.array1.length = src.array1.size;
-        foreach(i;0U..dst.array1.length) {
-            dst.array1[i] = src.array1.data[i];
+        foreach(i;0U..dst.bool_values.length) {
+            dst.bool_values[i] = src.bool_values[i];
         }
 
-        dst.array2.length = src.array2.size;
-        foreach(i;0U..dst.array2.length) {
-            dst.array2[i] = src.array2.data[i];
+        foreach(i;0U..dst.byte_values.length) {
+            dst.byte_values[i] = src.byte_values[i];
         }
 
-        dst.array3.length = src.array3.size;
-        foreach(i;0U..dst.array3.length) {
-            dst.array3[i] = fromStringz(src.array3.data[i].data).dup();
+        foreach(i;0U..dst.char_values.length) {
+            dst.char_values[i] = src.char_values[i];
         }
+
+        foreach(i;0U..dst.float32_values.length) {
+            dst.float32_values[i] = src.float32_values[i];
+        }
+
+        foreach(i;0U..dst.float64_values.length) {
+            dst.float64_values[i] = src.float64_values[i];
+        }
+
+        foreach(i;0U..dst.int8_values.length) {
+            dst.int8_values[i] = src.int8_values[i];
+        }
+
+        foreach(i;0U..dst.uint8_values.length) {
+            dst.uint8_values[i] = src.uint8_values[i];
+        }
+
+        foreach(i;0U..dst.int16_values.length) {
+            dst.int16_values[i] = src.int16_values[i];
+        }
+
+        foreach(i;0U..dst.uint16_values.length) {
+            dst.uint16_values[i] = src.uint16_values[i];
+        }
+
+        foreach(i;0U..dst.int32_values.length) {
+            dst.int32_values[i] = src.int32_values[i];
+        }
+
+        foreach(i;0U..dst.uint32_values.length) {
+            dst.uint32_values[i] = src.uint32_values[i];
+        }
+
+        foreach(i;0U..dst.int64_values.length) {
+            dst.int64_values[i] = src.int64_values[i];
+        }
+
+        foreach(i;0U..dst.uint64_values.length) {
+            dst.uint64_values[i] = src.uint64_values[i];
+        }
+
+        foreach(i;0U..dst.string_values.length) {
+            dst.string_values[i] = fromStringz(src.string_values[i].data).dup();
+        }
+
+        foreach(i;0U..dst.basic_types_values.length) {
+            test_msgs.msg.BasicTypes.convert(src.basic_types_values[i], dst.basic_types_values[i]);
+        }
+
+        foreach(i;0U..dst.constants_values.length) {
+            test_msgs.msg.Constants.convert(src.constants_values[i], dst.constants_values[i]);
+        }
+
+        foreach(i;0U..dst.defaults_values.length) {
+            test_msgs.msg.Defaults.convert(src.defaults_values[i], dst.defaults_values[i]);
+        }
+
+        foreach(i;0U..dst.bool_values.length) {
+            dst.bool_values[i] = src.bool_values[i];
+        }
+
+        foreach(i;0U..dst.byte_values.length) {
+            dst.byte_values[i] = src.byte_values[i];
+        }
+
+        foreach(i;0U..dst.char_values.length) {
+            dst.char_values[i] = src.char_values[i];
+        }
+
+        foreach(i;0U..dst.float32_values.length) {
+            dst.float32_values[i] = src.float32_values[i];
+        }
+
+        foreach(i;0U..dst.float64_values.length) {
+            dst.float64_values[i] = src.float64_values[i];
+        }
+
+        foreach(i;0U..dst.int8_values.length) {
+            dst.int8_values[i] = src.int8_values[i];
+        }
+
+        foreach(i;0U..dst.uint8_values.length) {
+            dst.uint8_values[i] = src.uint8_values[i];
+        }
+
+        foreach(i;0U..dst.int16_values.length) {
+            dst.int16_values[i] = src.int16_values[i];
+        }
+
+        foreach(i;0U..dst.uint16_values.length) {
+            dst.uint16_values[i] = src.uint16_values[i];
+        }
+
+        foreach(i;0U..dst.int32_values.length) {
+            dst.int32_values[i] = src.int32_values[i];
+        }
+
+        foreach(i;0U..dst.uint32_values.length) {
+            dst.uint32_values[i] = src.uint32_values[i];
+        }
+
+        foreach(i;0U..dst.int64_values.length) {
+            dst.int64_values[i] = src.int64_values[i];
+        }
+
+        foreach(i;0U..dst.uint64_values.length) {
+            dst.uint64_values[i] = src.uint64_values[i];
+        }
+
+        foreach(i;0U..dst.string_values.length) {
+            dst.string_values[i] = fromStringz(src.string_values[i].data).dup();
+        }
+
+
+        dst.alighment_check = src.alighment_check;
 
     }
 }
 
-struct Depend
+struct BasicTypes
 {
-    builtin_interfaces.msg.Time stamp;
-    string data;
+    bool bool_value;
+    byte byte_value;
+    ubyte char_value;
+    float float32_value;
+    double float64_value;
+    byte int8_value;
+    ubyte uint8_value;
+    short int16_value;
+    ushort uint16_value;
+    int int32_value;
+    uint uint32_value;
+    long int64_value;
+    ulong uint64_value;
 
 
-    alias CType = test_msgs__msg__Depend;
-    alias CArrayType = test_msgs__msg__Depend__Sequence;
+    alias CType = test_msgs__msg__BasicTypes;
+    alias CArrayType = test_msgs__msg__BasicTypes__Sequence;
 
     static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
     {
-        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Depend();
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__BasicTypes();
     }
 
     static CType* createC() @nogc nothrow
     {
-        return test_msgs__msg__Depend__create();
+        return test_msgs__msg__BasicTypes__create();
     }
 
     static void destroyC(ref CType * msg) @nogc nothrow
     {
-        test_msgs__msg__Depend__destroy(msg);
+        test_msgs__msg__BasicTypes__destroy(msg);
         msg = null;
     }
 
     static CArrayType *createC(size_t size) @nogc nothrow
     {
-        return test_msgs__msg__Depend__Sequence__create(size);
+        return test_msgs__msg__BasicTypes__Sequence__create(size);
     }
 
     static destroyC(ref CArrayType * msg) @nogc nothrow
     {
-        test_msgs__msg__Depend__Sequence__destroy(msg);
+        test_msgs__msg__BasicTypes__Sequence__destroy(msg);
         msg = null;
     }
 
-    static convert(in Depend src, ref Depend.CType dst)
+    static convert(in BasicTypes src, ref BasicTypes.CType dst)
     {
 
 
-        builtin_interfaces.msg.Time.convert(src.stamp, dst.stamp);
+        dst.bool_value = src.bool_value;
 
 
-        rosidl_runtime_c__String__assign(&dst.data, toStringz(src.data));
+        dst.byte_value = src.byte_value;
+
+
+        dst.char_value = src.char_value;
+
+
+        dst.float32_value = src.float32_value;
+
+
+        dst.float64_value = src.float64_value;
+
+
+        dst.int8_value = src.int8_value;
+
+
+        dst.uint8_value = src.uint8_value;
+
+
+        dst.int16_value = src.int16_value;
+
+
+        dst.uint16_value = src.uint16_value;
+
+
+        dst.int32_value = src.int32_value;
+
+
+        dst.uint32_value = src.uint32_value;
+
+
+        dst.int64_value = src.int64_value;
+
+
+        dst.uint64_value = src.uint64_value;
 
     }
 
-    static convert(in Depend.CType src, out Depend dst)
+    static convert(in BasicTypes.CType src, out BasicTypes dst)
     {
 
 
-        builtin_interfaces.msg.Time.convert(src.stamp, dst.stamp);
+        dst.bool_value = src.bool_value;
 
 
-        dst.data = fromStringz(src.data.data).dup();
+        dst.byte_value = src.byte_value;
+
+
+        dst.char_value = src.char_value;
+
+
+        dst.float32_value = src.float32_value;
+
+
+        dst.float64_value = src.float64_value;
+
+
+        dst.int8_value = src.int8_value;
+
+
+        dst.uint8_value = src.uint8_value;
+
+
+        dst.int16_value = src.int16_value;
+
+
+        dst.uint16_value = src.uint16_value;
+
+
+        dst.int32_value = src.int32_value;
+
+
+        dst.uint32_value = src.uint32_value;
+
+
+        dst.int64_value = src.int64_value;
+
+
+        dst.uint64_value = src.uint64_value;
 
     }
 }
 
-struct Constant
+struct Empty
 {
-    ubyte data;
+    ubyte structure_needs_at_least_one_member;
 
-    enum ubyte TEST = 0;
 
-    alias CType = test_msgs__msg__Constant;
-    alias CArrayType = test_msgs__msg__Constant__Sequence;
+    alias CType = test_msgs__msg__Empty;
+    alias CArrayType = test_msgs__msg__Empty__Sequence;
 
     static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
     {
-        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Constant();
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Empty();
     }
 
     static CType* createC() @nogc nothrow
     {
-        return test_msgs__msg__Constant__create();
+        return test_msgs__msg__Empty__create();
     }
 
     static void destroyC(ref CType * msg) @nogc nothrow
     {
-        test_msgs__msg__Constant__destroy(msg);
+        test_msgs__msg__Empty__destroy(msg);
         msg = null;
     }
 
     static CArrayType *createC(size_t size) @nogc nothrow
     {
-        return test_msgs__msg__Constant__Sequence__create(size);
+        return test_msgs__msg__Empty__Sequence__create(size);
     }
 
     static destroyC(ref CArrayType * msg) @nogc nothrow
     {
-        test_msgs__msg__Constant__Sequence__destroy(msg);
+        test_msgs__msg__Empty__Sequence__destroy(msg);
         msg = null;
     }
 
-    static convert(in Constant src, ref Constant.CType dst)
+    static convert(in Empty src, ref Empty.CType dst)
     {
 
 
-        dst.data = src.data;
+        dst.structure_needs_at_least_one_member = src.structure_needs_at_least_one_member;
 
     }
 
-    static convert(in Constant.CType src, out Constant dst)
+    static convert(in Empty.CType src, out Empty dst)
     {
 
 
-        dst.data = src.data;
+        dst.structure_needs_at_least_one_member = src.structure_needs_at_least_one_member;
 
     }
 }
 
-struct FixedArray
+struct Nested
 {
-    double[10] data;
+    test_msgs.msg.BasicTypes basic_types_value;
 
 
-    alias CType = test_msgs__msg__FixedArray;
-    alias CArrayType = test_msgs__msg__FixedArray__Sequence;
+    alias CType = test_msgs__msg__Nested;
+    alias CArrayType = test_msgs__msg__Nested__Sequence;
 
     static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
     {
-        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__FixedArray();
+        return rosidl_typesupport_c__get_message_type_support_handle__test_msgs__msg__Nested();
     }
 
     static CType* createC() @nogc nothrow
     {
-        return test_msgs__msg__FixedArray__create();
+        return test_msgs__msg__Nested__create();
     }
 
     static void destroyC(ref CType * msg) @nogc nothrow
     {
-        test_msgs__msg__FixedArray__destroy(msg);
+        test_msgs__msg__Nested__destroy(msg);
         msg = null;
     }
 
     static CArrayType *createC(size_t size) @nogc nothrow
     {
-        return test_msgs__msg__FixedArray__Sequence__create(size);
+        return test_msgs__msg__Nested__Sequence__create(size);
     }
 
     static destroyC(ref CArrayType * msg) @nogc nothrow
     {
-        test_msgs__msg__FixedArray__Sequence__destroy(msg);
+        test_msgs__msg__Nested__Sequence__destroy(msg);
         msg = null;
     }
 
-    static convert(in FixedArray src, ref FixedArray.CType dst)
+    static convert(in Nested src, ref Nested.CType dst)
     {
 
-        foreach(i;0U..src.data.length) {
-            dst.data[i] = src.data[i];
-        }
+
+        test_msgs.msg.BasicTypes.convert(src.basic_types_value, dst.basic_types_value);
 
     }
 
-    static convert(in FixedArray.CType src, out FixedArray dst)
+    static convert(in Nested.CType src, out Nested dst)
     {
 
-        foreach(i;0U..dst.data.length) {
-            dst.data[i] = src.data[i];
-        }
+
+        test_msgs.msg.BasicTypes.convert(src.basic_types_value, dst.basic_types_value);
 
     }
 }

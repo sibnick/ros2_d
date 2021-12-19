@@ -26,13 +26,14 @@ string render(T)(MustacheEngine!T mustache, in Manifest m)
     return mustache.renderString(tmpl, cxt).trimTrailingWhitespace();
 }
 
-@("render DUB") unittest
+@("render") unittest
 {
-    import msg_gen.test_helper;
+    import test_helper.test_msgs : TestMsgs;
 
-    auto m = TestData.Internal.manifest;
-
+    const m = Manifest(TestMsgs.name, TestMsgs.version_, "install/test_msgs/lib", MessageModule(
+            TestMsgs.name ~ "::msg"));
     MustacheEngine!string mustache;
     const answer = render(mustache, m);
-    assert(answer == TestData.Output.dubJson, answer);
+    const reference = import("test/output/test_msgs/dub.json");
+    assert(answer == reference, answer);
 }

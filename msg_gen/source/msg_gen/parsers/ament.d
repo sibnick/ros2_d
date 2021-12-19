@@ -26,6 +26,17 @@ string[] findAmentPackages(string amentPrefix)
     return pkgs;
 }
 
+@("findAmentPackages") unittest
+{
+    import test_helper.ament;
+    import std.algorithm : sort;
+    import std.path : buildPath;
+    import std.array;
+
+    const answer = findAmentPackages(amentPrefixPath).sort.array;
+    assert(answer == [buildPath(amentPrefixPath, "share", "test_msgs")]);
+}
+
 Manifest[] findMessagePackages(string amentPrefix)
 {
     const pkgDirs = findAmentPackages(amentPrefix);
@@ -40,6 +51,14 @@ Manifest[] findMessagePackages(string amentPrefix)
         }
     }
     return pkgs;
+}
+
+@("findMessagePackages") unittest
+{
+    import test_helper.ament;
+
+    auto answer = findMessagePackages(amentPrefixPath);
+    assert(answer.length == 1);
 }
 
 Manifest[] findMessagePackages()

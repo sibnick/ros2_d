@@ -25,7 +25,13 @@ void main()
         "tests/msg_gen/tests-*",
         "tests/rcld/.dub",
         "tests/rcld/dub.selections.json",
-        "tests/rcld/tests-*"
+        "tests/rcld/tests-*",
+        "test_helper/.dub",
+        "test_helper/ament/build",
+        "test_helper/ament/install",
+        "test_helper/ament/log",
+        "test_helper/ament/src/test_interfaces"
     ];
     format!"rm -rf %-(%s %)"(items).run;
+    "rm -rf -- *.lst".run;
 }

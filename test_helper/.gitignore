@@ -1,0 +1,14 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/test_helper*
+*.a
+*.exe
+*.o
+*.obj
+*.lst
+ament/build
+ament/install
+ament/log
+ament/src/test_interfaces_files

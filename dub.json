@@ -9,6 +9,7 @@
 	"subPackages": [
 		"./msg_gen",
 		"./rcl_bind",
-		"./rcld"
+		"./rcld",
+		"./test_helper"
 	]
 }

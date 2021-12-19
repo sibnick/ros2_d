@@ -1,8 +1,15 @@
 import msg_gen;
 import jcli;
 
-int main(string[] args)
+version (unittest)
 {
-    auto executor = new CommandLineInterface!(msg_gen.commands);
-    return executor.parseAndExecute(args);
+    // Do nothing
+}
+else
+{
+    int main(string[] args)
+    {
+        auto executor = new CommandLineInterface!(msg_gen.commands);
+        return executor.parseAndExecute(args);
+    }
 }

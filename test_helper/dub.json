@@ -1,0 +1,15 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"description": "test_helper",
+	"license": "Apache-2.0",
+	"name": "test_helper",
+	"preGenerateCommands": [
+		"rdmd ament/setup"
+	],
+	"stringImportPaths": [
+		"ament/install/test_msgs/share/test_msgs"
+	]
+}

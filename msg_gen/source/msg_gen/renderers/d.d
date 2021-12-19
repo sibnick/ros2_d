@@ -124,12 +124,16 @@ string render(T)(MustacheEngine!T mustache, in MessageModule mm)
     return mustache.renderString(tmpl, cxt).trimTrailingWhitespace();
 }
 
-@("render MessageModule") unittest
+@("render") unittest
 {
     import msg_gen.test_helper;
 
-    const data = TestData.Internal.manifest.message;
+    const data = fromTestMsgs;
+
     MustacheEngine!string mustache;
     const answer = render(mustache, data);
-    assert(answer == TestData.Output.msgD, answer);
+
+    const reference = import("test/output/test_msgs/source/test_msgs/msg.d");
+    assert(answer == reference, answer);
+
 }

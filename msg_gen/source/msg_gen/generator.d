@@ -23,9 +23,12 @@ void generateDUB(in Manifest m, string outDir)
     }
 }
 
-@("generateDUB") unittest
+@("generateDUB test_msgs") unittest
 {
+    import test_helper.test_msgs : TestMsgsData, TestMsgs;
+    import test_helper.utils;
     import msg_gen.test_helper;
+
     import msg_gen.rosidl.type;
 
     const tempDir = makeUniqTemp;
@@ -36,15 +39,17 @@ void generateDUB(in Manifest m, string outDir)
         rmdirRecurse(tempDir);
     }
 
-    const m = TestData.Internal.manifest;
+    const name = TestMsgs.name;
+
+    const m = Manifest(name, TestMsgs.version_, "install/" ~ name ~ "/lib", fromTestMsgs);
 
     generateDUB(m, tempDir);
 
-    const dubRoot = buildPath(tempDir, "test_msgs");
+    const dubRoot = buildPath(tempDir, name);
 
     const dubPath = buildPath(dubRoot, "dub.json");
-    const dMsgPath = buildPath(dubRoot, "source", "test_msgs", "msg.d");
-    const cMsgPath = buildPath(dubRoot, "source", "test_msgs", "c", "msg.d");
+    const dMsgPath = buildPath(dubRoot, "source", name, "msg.d");
+    const cMsgPath = buildPath(dubRoot, "source", name, "c", "msg.d");
 
     assert(exists(dubPath));
     assert(exists(dMsgPath));
@@ -90,9 +95,12 @@ void generateDUBAsDepend(in Manifest m, string outDir)
     generateDUB(m, dir);
 }
 
-@("generateDUB") unittest
+@("generateDUB test_msgs") unittest
 {
+    import test_helper.test_msgs : TestMsgsData, TestMsgs;
+    import test_helper.utils;
     import msg_gen.test_helper;
+
     import msg_gen.rosidl.type;
 
     const tempDir = makeUniqTemp;
@@ -103,18 +111,20 @@ void generateDUBAsDepend(in Manifest m, string outDir)
         rmdirRecurse(tempDir);
     }
 
-    const m = TestData.Internal.manifest;
+    const name = TestMsgs.name;
+    const version_ = TestMsgs.version_;
 
+    const m = Manifest(name, version_, "install/" ~ name ~ "/lib", fromTestMsgs);
     generateDUBAsDepend(m, tempDir);
 
-    const depRoot = buildPath(tempDir, "test_msgs-1.2.3");
-    const lockPath = buildPath(depRoot, "test_msgs.lock");
+    const depRoot = buildPath(tempDir, name ~ "-" ~ version_);
+    const lockPath = buildPath(depRoot, name ~ ".lock");
 
-    const dubRoot = buildPath(depRoot, "test_msgs");
+    const dubRoot = buildPath(depRoot, name);
 
     const dubPath = buildPath(dubRoot, "dub.json");
-    const dMsgPath = buildPath(dubRoot, "source", "test_msgs", "msg.d");
-    const cMsgPath = buildPath(dubRoot, "source", "test_msgs", "c", "msg.d");
+    const dMsgPath = buildPath(dubRoot, "source", name, "msg.d");
+    const cMsgPath = buildPath(dubRoot, "source", name, "c", "msg.d");
 
     assert(exists(lockPath));
     assert(exists(dubPath));

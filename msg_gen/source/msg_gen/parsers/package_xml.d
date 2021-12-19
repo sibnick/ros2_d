@@ -81,12 +81,13 @@ Manifest parseROS2Package(string root)
     return m;
 }
 
-@("parseROS2Package") unittest
+@("parse test_msgs") unittest
 {
-    import std.format;
-    import msg_gen.test_helper;
+    import test_helper.test_msgs;
+    import test_helper.utils;
+    import std.path;
+    import std.traits;
 
-    // deploy package in temp directory
     const tempDir = makeUniqTemp;
     scope (exit)
     {
@@ -97,15 +98,23 @@ Manifest parseROS2Package(string root)
     const msgDir = buildPath(tempDir, "msg");
     msgDir.mkdirRecurse;
 
-    write(buildPath(tempDir, "package.xml"), TestData.Input.packageXml);
-    write(buildPath(tempDir, "msg", "StandAline.idl"), TestData.Input.standAloneIdl);
-    write(buildPath(tempDir, "msg", "Depend.idl"), TestData.Input.dependIdl);
+    write(buildPath(tempDir, "package.xml"), TestMsgs.packageXML);
 
+    int deployedCount = 0;
+    static foreach (type; __traits(allMembers, TestMsgs.Msg))
+    {
+        static if (!hasUDA!(__traits(getMember, TestMsgs.Msg, type), NotSupported))
+        {
+            write(buildPath(tempDir, "msg", type ~ ".idl"), mixin("TestMsgs.Msg." ~ type));
+            deployedCount++;
+        }
+    }
     const answer = parseROS2Package(tempDir);
 
-    assert(answer.packageName == TestData.packageName);
-    assert(answer.version_ == TestData.version_);
+    assert(answer.packageName == TestMsgs.name);
+    assert(answer.version_ == TestMsgs.version_);
     assert(answer.installDirectory == ""); // Need to be filled later
-    assert(answer.depends.length == 1);
-    assert(answer.message.messages.length == 2);
+    assert(answer.depends.length == 0);
+    assert(answer.message.messages.length == deployedCount);
+
 }

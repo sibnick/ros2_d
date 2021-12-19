@@ -1,9 +1,0 @@
-module test_msgs {
-  module msg {
-    typedef double double__10[10];
-
-    struct FixedArray {
-      double__10 data;
-    };
-  };
-};

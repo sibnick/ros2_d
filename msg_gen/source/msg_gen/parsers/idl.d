@@ -278,104 +278,110 @@ class Parser
         }
         return true;
     }
+}
 
-    @("one file : StandAlone") unittest
+version (unittest)
+{
+    import test_helper.test_msgs : TestMsgs, NotSupported, TestMsgsData;
+    import std.conv;
+
+    /**
+     * Parse `Type` IDL file
+     * Returns: Parsed MessageModule
+     */
+    auto parse(string Type)()
     {
-        import std.conv : to;
-        import msg_gen.test_helper;
 
-        const mod = TestData.packageName ~ "::msg";
-
+        // read test data
+        const moduleName = TestMsgs.name ~ "::msg";
         auto parser = new Parser();
-        parser.consume(TestData.Input.standAloneIdl);
+        parser.consume(mixin("TestMsgs.Msg." ~ Type));
 
-        assert(parser.messageModules.length == 1);
-        assert(mod in parser.messageModules);
+        // check fundamental conditions
+        const mm = parser.messageModules;
+        assert(mm.length == 1, mm.to!string);
+        assert(moduleName in mm, mm.to!string);
 
-        const answer = parser.messageModules[mod];
-        const reference = MessageModule(mod, [], [TestData.Internal.standAlone]);
-        assert(answer == reference, answer.to!string);
+        return mm[moduleName];
     }
 
-    @("one file : Depend") unittest
+}
+
+@("test_msgs one-by-one") unittest
+{
+    import std.stdio : stderr;
+    import std.traits : hasUDA;
+    import std.format : format;
+    import std.range : zip;
+
+    static foreach (type; __traits(allMembers, TestMsgs.Msg))
     {
-        import std.conv : to;
-        import msg_gen.test_helper;
+        static if (hasUDA!(__traits(getMember, TestMsgs.Msg, type), NotSupported))
+        {
+            stderr.writefln!" >> %s is not supported. Skipping."(type);
+        }
+        else
+        {
+            {
+                alias Reference = mixin(format!"TestMsgsData.Msg.%s"(type));
+                const answer = parse!type;
+                assert(answer.messages.length == 1, type);
+                const struct_ = answer.messages[0];
+                assert(struct_.fullname == Reference.name, type);
+                assert(struct_.members.length == Reference.members.length, type);
 
-        const mod = TestData.packageName ~ "::msg";
+                zip(struct_.members, Reference.members).each!((a) {
+                    import test_helper.test_msgs : HelperType = Type;
 
-        auto parser = new Parser();
+                    // about type
+                    assert(a[0].type.fullname == a[1].type.name, type);
+                    assert(a[0].type.isArray == (a[1].type.kind != HelperType.Kind.plain), type);
+                    assert(a[0].type.isDynamicArray == (
+                        a[1].type.kind == HelperType.Kind.dynamicArray), type);
+                    assert(a[0].type.isFixedArray == (a[1].type.kind == HelperType.Kind.staticArray), type);
 
-        parser.consume(TestData.Input.dependIdl);
+                    if (a[1].type.kind == HelperType.Kind.staticArray)
+                    {
+                        assert(a[0].type.size == a[1].type.size, type);
+                    }
 
-        assert(parser.messageModules.length == 1);
-        assert(mod in parser.messageModules);
+                    // about field
+                    assert(a[0].field == a[1].field, type);
 
-        const answer = parser.messageModules[mod];
-        const reference = MessageModule(mod, [TestData.Internal.builtinType], [
-                TestData.Internal.depend
-            ]);
-        assert(answer == reference, answer.to!string);
+                    // about default
+                    assert(a[0].defaultText == a[1].default_, type);
+
+                    // skip about comment
+
+                });
+            }
+        }
+    }
+}
+
+@("test_msgs parse-all") unittest
+{
+    import std.traits : hasUDA;
+    import std.format : format;
+
+    const moduleName = TestMsgs.name ~ "::msg";
+
+    int parsedCount = 0;
+    auto parser = new Parser();
+    static foreach (type; __traits(allMembers, TestMsgs.Msg))
+    {
+        static if (!hasUDA!(__traits(getMember, TestMsgs.Msg, type), NotSupported))
+        {
+            parser.consume(mixin(format!"TestMsgs.Msg.%s"(type)));
+            parsedCount++;
+        }
     }
 
-    @("one file : Constant") unittest
-    {
-        import std.conv : to;
-        import msg_gen.test_helper;
+    assert(parser.messageModules.length == 1);
+    assert(moduleName in parser.messageModules);
 
-        const mod = TestData.packageName ~ "::msg";
+    const mm = parser.messageModules[moduleName];
+    assert(mm.fullname == moduleName);
+    assert(mm.messages.length == parsedCount);
 
-        auto parser = new Parser();
-
-        parser.consume(TestData.Input.constantIdl);
-
-        assert(parser.messageModules.length == 1);
-        assert(mod in parser.messageModules);
-        const answer = parser.messageModules[mod];
-        const reference = MessageModule(mod, [], [TestData.Internal.constant]);
-
-        assert(answer == reference, answer.to!string);
-
-    }
-
-    @("one file : FixedArray") unittest
-    {
-        import std.conv : to;
-        import msg_gen.test_helper;
-
-        const mod = TestData.packageName ~ "::msg";
-
-        auto parser = new Parser();
-
-        parser.consume(TestData.Input.fixedArrayIdl);
-
-        assert(parser.messageModules.length == 1);
-        assert(mod in parser.messageModules);
-        const answer = parser.messageModules[mod];
-        const reference = MessageModule(mod, [], [TestData.Internal.fixedArray]);
-
-        assert(answer == reference, answer.to!string);
-    }
-
-    @("multiple files") unittest
-    {
-        import std.conv : to;
-        import msg_gen.test_helper;
-
-        const mod = TestData.packageName ~ "::msg";
-
-        auto parser = new Parser();
-
-        parser.consume(TestData.Input.standAloneIdl);
-        parser.consume(TestData.Input.dependIdl);
-        parser.consume(TestData.Input.constantIdl);
-        parser.consume(TestData.Input.fixedArrayIdl);
-
-        assert(parser.messageModules.length == 1);
-        assert(mod in parser.messageModules);
-
-        const answer = parser.messageModules["test_msgs::msg"];
-        const reference = TestData.Internal.manifest.message;
-        assert(answer == reference, answer.to!string);
-    }
 }

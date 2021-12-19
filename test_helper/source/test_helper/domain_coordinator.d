@@ -1,4 +1,4 @@
-module rcld.test_helper.domain_coordinator;
+module test_helper.domain_coordinator;
 
 import std.socket;
 import std.stdio;
@@ -61,18 +61,9 @@ auto findVacantDomainID()
     assert(0, "Failed to find vacant deomain_id.");
 }
 
-// Just printing ROS_DISTRO
-version (foxy) @("foxy is here") unittest
-{
-}
-
-version (galactic) @("galactic is here") unittest
-{
-}
-
-version (rolling) @("rolling is here") unittest
-{
-}
+version (foxy) pragma(msg, "ROS_DISTRO is foxy");
+version (galactic) pragma(msg, "ROS_DISTRO is galactic");
+version (rolling) pragma(msg, "ROS_DISTRO is rolling");
 
 @("choose different domain_id") unittest
 {
