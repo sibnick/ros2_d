@@ -1,5 +1,8 @@
 # For developer
 
+[ros2_d_devenv](https://github.com/nonanonno/ros2_d_devenv) is a development environment for `ros2_d`.
+If you are a vscode user, you can setup the environment easily by using it.
+
 ## Prerequisites
 
 - ROS2 (See [Supprting environment](../README.md#supporting-environments))
