@@ -82,7 +82,7 @@ class Parser
         }
 
         SList!string moduleName;
-        SList!Structure struct_;
+        Structure currentStructure;
 
         Type[] depends;
         Structure[] structs;
@@ -100,7 +100,7 @@ class Parser
         {
             const name = p.getFirst!"Name".getData;
             const fullname = (moduleName.array.reverse ~ name).join("::");
-            struct_.insert(Structure(fullname, []));
+            currentStructure = Structure(fullname, []);
             auto annotations = p.all!"Annotation"
                 .map!(a => parseAnnotation(a));
             foreach (a; annotations)
@@ -108,12 +108,11 @@ class Parser
                 if (a.name == "@verbatim" && a.content.get("language", "") == "\"comment\"" && "text" in a
                     .content)
                 {
-                    struct_.front.comment = a.content["text"].nullable;
+                    currentStructure.comment = a.content["text"].nullable;
                 }
             }
             p.children.each!(c => parse(c));
-            structs ~= struct_.front;
-            struct_.removeAny();
+            structs ~= currentStructure;
         }
 
         void parseConstant(in ParseTree p)
@@ -173,7 +172,7 @@ class Parser
             const solvedType = typedefMap.get(type, Type(type, isArray));
 
             const member = Member(solvedType, field, defaultText, comment);
-            struct_.front.members ~= member;
+            currentStructure.members ~= member;
         }
 
         Annotation parseAnnotation(in ParseTree p)

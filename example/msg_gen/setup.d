@@ -10,5 +10,5 @@ void run(string cmd, string workDir = __FILE_FULL_PATH__.dirName)
 
 void main()
 {
-    "dub run -y ros2_d:msg_gen -- .dub/packages".run;
+    "dub run --root ../../ :msg_gen -- .dub/packages".run;
 }
