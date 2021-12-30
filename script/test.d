@@ -6,8 +6,6 @@ enum workingDir = __FILE_FULL_PATH__.dirName.dirName; // to top
 alias run = runImpl!workingDir;
 alias exec = execImpl!workingDir;
 
-const subs = ["msg_gen", "rcld"];
-
 void helpText(Config[] configs)
 {
     stderr.writeln("rdmd script/test <dub|test> <target>");
@@ -24,7 +22,7 @@ void testTests(string target)
     format!"rdmd tests/%s/test"(target).run;
 }
 
-const dubList = ["msg_gen", "rcld"];
+const dubList = ["msg_gen", "rcld", "rosidl_parser"];
 const testList = ["msg_gen", "rcld"];
 
 struct Config

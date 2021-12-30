@@ -10,6 +10,7 @@
 		"./msg_gen",
 		"./rcl_bind",
 		"./rcld",
-		"./test_helper"
+		"./test_helper",
+		"./rosidl_parser"
 	]
 }

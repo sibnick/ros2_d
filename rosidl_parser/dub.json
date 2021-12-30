@@ -1,0 +1,16 @@
+{
+	"authors": [
+		"nonanonno"
+	],
+	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"pegged": "~>0.4.5",
+		"silly": "~>1.1.1"
+	},
+	"description": "Parser for .idl ROS interface files.",
+	"license": "Apache-2.0",
+	"name": "rosidl_parser",
+	"stringImportPaths": [
+		"resources"
+	]
+}

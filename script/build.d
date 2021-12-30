@@ -4,7 +4,7 @@ import common;
 enum workingDir = __FILE_FULL_PATH__.dirName.dirName; // to top
 alias run = runImpl!workingDir;
 
-const subs = ["msg_gen", "rcld"];
+const subs = ["msg_gen", "rcld", "rosidl_parser"];
 
 void main()
 {

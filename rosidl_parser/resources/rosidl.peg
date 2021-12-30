@@ -1,0 +1,336 @@
+# https://www.omg.org/spec/IDL/4.2/PDF -> OMG IDL rule number
+# https://design.ros2.org/articles/idl_interface_definition.html -> Subset definition of OMG IDL
+# https://github.com/ros2/rosidl/tree/master/rosidl_parser/rosidl_parser -> Official implementation
+# While lowercase is used in the specification, in this peg file, PascalCase is used instead.
+ROSIDL:
+  #### 7.4.1.4.1 IDL Specification
+  # (1), 7.4.6.4.1.4
+  Specification < (Definition / IncludeDirective)+
+
+  # (2)
+  Definition    < (
+    / ModuleDcl
+    / ConstDcl
+    / TypeDcl
+    ) ';'
+
+  #### 7.4.1.4.2 Modules
+
+  # (3), 7.4.15.2
+  ModuleDcl    < AnnotationAppl* 'module' Identifier '{' Definition+ '}'
+
+  # (4)
+  ScopedName   < (Identifier | ('::' Identifier) | (ScopedName '::' Identifier))
+
+  #### 7.4.1.4.3 Constants
+
+  # (5), 7.4.15.2
+  ConstDcl     < AnnotationAppl* 'const' ConstType Identifier '=' ~ConstExpr
+
+  # (6)
+  ConstType    < (
+    / FloatingPtType
+    / IntegerType
+    / FixedPtConstType
+    / CharType
+    / WideCharType
+    / BooleanType
+    / OctetType
+    / StringType
+    / WideStringType
+    / ScopedName
+  )
+
+  # (7)
+  ConstExpr    <~ OrExpr
+
+  # (8)
+  OrExpr  < (XorExpr / (OrExpr '|' XorExpr))
+
+  # (9)
+  XorExpr < (AndExpr / (XorExpr '^' AndExpr))
+
+  # (10)
+  AndExpr < (ShiftExpr / (AndExpr '&' ShiftExpr))
+
+  # (11)
+  ShiftExpr < (AddExpr / (ShiftExpr '>>' AddExpr) / (ShiftExpr '<<' AddExpr))
+
+  # (12)
+  AddExpr   < (MultiExpr / (AddExpr '+' MultiExpr) / (AddExpr '-' MultiExpr))
+
+  # (13)
+  MultiExpr < (UnaryExpr / (MultiExpr '*' UnaryExpr) / (MultiExpr '/' UnaryExpr) / (MultiExpr '%' UnaryExpr))
+
+  # (14)
+  UnaryExpr < ((UnaryOperator PrimaryExpr) / PrimaryExpr)
+
+  # (15)
+  UnaryOperator < ('-' / '+' / '~')
+
+  # (16)
+  PrimaryExpr < (ScopedName | Literal | ('(' ConstExpr ')'))
+
+  # (17)
+  Literal       < (
+    | IntegerLiteral
+    | FloatingPtLiteral
+    | FixedPtLiteral
+    | CharacterLiteral
+    | WideCharacterLiteral
+    | BooleanLiteral
+    | StringLiterals
+    | WideStringLiterals
+  )
+
+  # (18) lowercases are added
+  BooleanLiteral  <- BooleanLiteralTrue / BooleanLiteralFalse
+  # separate rules
+  BooleanLiteralTrue <- 'TRUE' / 'true'
+  BooleanLiteralFalse <- 'FALSE' / 'false'
+
+  # (19)
+  PositiveIntConst  < ConstExpr
+
+  # (20)
+  TypeDcl < (
+    / ConstrTypeDcl
+    # / NativeDcl
+    / TypedefDcl
+  )
+
+  #### 7.4.1.4.4 Data Types
+  ### 7.4.1.4.4.1 Referencing Types
+
+  # (21), (216)
+  TypeSpec  <- TemplateTypeSpec / SimpleTypeSpec
+
+  # (22)
+  SimpleTypeSpec  <- BaseTypeSpec | ScopedName
+
+  ### 7.4.1.4.4.2 Basic Types
+
+  # (23)
+  BaseTypeSpec  < (
+    / FloatingPtType
+    / IntegerType
+    / CharType
+    / WideCharType
+    / BooleanType
+    / OctetType
+  )
+
+  # (24)
+  FloatingPtType  < ('float' | 'double' | ('long' 'double'))
+
+  # (25)
+  IntegerType  < (SignedInt | UnsignedInt)
+
+  # (26), (206)
+  SignedInt < (SignedShortInt | SignedLongInt | SignedLonglongInt | SignedTinyInt)
+
+  # (27), (210)
+  SignedShortInt < 'short' | 'int16'
+
+  # (28), (211)
+  SignedLongInt < 'long' | 'int32'
+
+  # (29), (212)
+  SignedLonglongInt < ('long' 'long') | 'int64'
+
+  # (30), (207)
+  UnsignedInt < (UnsignedShortInt | UnsignedLongInt | UnsignedLonglongInt | UnsignedTinyInt)
+
+  # (31), (213)
+  UnsignedShortInt < ('unsigned' 'short') | 'uint16'
+
+  # (32), (214)
+  UnsignedLongInt  < ('unsigned' 'long') | 'uint32'
+
+  # (33), (215)
+  UnsignedLonglongInt < ('unsigned' 'long' 'long') | 'uint64'
+
+  # (34)
+  CharType  < 'char'
+
+  # (35)
+  WideCharType  < 'wchar'
+
+  # (36)
+  BooleanType < 'boolean'
+
+  # (37)
+  OctetType < 'octet'
+
+  ### 7.4.1.4.4.3 Template Types
+
+  # (38)
+  TemplateTypeSpec  < (
+    / SequenceType
+    / StringType
+    / WideStringType
+    / FixedPtType
+  )
+
+  # (39)
+  SequenceType  < (('sequence' '<' TypeSpec ',' PositiveIntConst '>') / ('sequence' '<' TypeSpec '>'))
+
+  # (40)
+  StringType  < (('string' '<' PositiveIntConst '>') / 'string')
+
+  # (41)
+  WideStringType  < (('wstring' '<' PositiveIntConst '>') / 'wstring')
+
+  # (42)
+  FixedPtType < 'fixed' '<' PositiveIntConst ',' PositiveIntConst '>'
+
+  # (43)
+  FixedPtConstType  < 'fixed'
+
+  ## 7.4.1.4.4.4 Constructed Types
+
+  # (44)
+  ConstrTypeDcl < (
+    / StructDcl
+    # / UnionDcl
+    # / EnumDcl
+  )
+
+  # (45)
+  StructDcl < (
+    / StructDef
+    # / StructForwardDcl
+  )
+
+  # (46), 7.4.15.2
+  StructDef < AnnotationAppl* 'struct' Identifier '{' Member+ '}'
+
+  # (47), 7.4.15.2
+  Member  < AnnotationAppl* TypeSpec Declarators ';'
+
+  # # (48)
+  # StructForwardDcl  < 'struct' Identifier
+  # # (49)
+  # UnionDcl < (UnionDef / UnionForwardDcl)
+  # # (50)
+  # UnionDcl
+  # # (51)
+  # UnionDef
+  # # (52)
+  # SwitchTypeSpec
+  # # (53)
+  # Case
+  # # (54)
+  # CaseLabel
+  # # (55)
+  # ElementSpec
+  # # (56)
+  # UnionForwardDcl
+  # # (57)
+  # EnumDcl
+  # # (58)
+  # Enumerator
+
+  # (59)
+  ArrayDeclarator < Identifier FixedArraySize+
+
+  # (60)
+  FixedArraySize  < '[' PositiveIntConst ']'
+
+  # # (61)
+  # NativeDcl
+
+  # (62)
+  SimpleDeclarator  <- Identifier
+
+  # (63)
+  TypedefDcl  < 'typedef' TypeDeclarator
+
+  # (64)
+  TypeDeclarator  < (TemplateTypeSpec | SimpleTypeSpec | ConstrTypeDcl) AnyDeclarators
+
+  # (65)
+  AnyDeclarators  < AnyDeclarator (',' AnyDeclarator)*
+
+  # (66)
+  AnyDeclarator <- SimpleDeclarator | ArrayDeclarator
+
+  # (67)
+  Declarators < Declarator (',' Declarator)*
+
+  # (68), (217)
+  Declarator  <- SimpleDeclarator | ArrayDeclarator
+
+  ##### 7.2.3 Identifiers
+  Identifier  <- identifier
+
+  ##### 7.2.6 Literals
+  #### 7.2.6.1 Integer Literals
+  IntegerLiteral <- HexadecimalInteger / Integer
+
+  #### 7.2.6.2 Character Literals
+  CharacterLiteral <- quote (!quote (EscapeSequence / .)) quote
+  WideCharacterLiteral <- 'L' CharacterLiteral
+
+
+  #### 7.2.6.3 String Literals
+  # adjacent string literals are concatenated
+  StringLiteral <- doublequote (DQChar)* doublequote
+  WideStringLiteral <- 'L' StringLiteral
+  StringLiterals < StringLiteral+
+  WideStringLiterals < WideStringLiteral+
+
+  #### 7.2.6.4 Floating-point Literals
+  FloatingPtLiteral <-
+    / Integer '.' Integer? (('e'/'E') Sign? Integer)?
+    / '.' Integer (('e'/'E') Sign? Integer)?
+    / Integer (('e'/'E') Sign? Integer)
+
+  #### 7.2.6.5 Fixed-Point Literals
+  FixedPtLiteral <- ((Integer '.' Integer?) / ('.' Integer)) ('d' / 'D')
+
+  ##### 7.2.2 Comments
+  Spacing <: (space / endOfLine / Comment)*
+  Comment <- (LineComment | BlockComment)
+  LineComment <- '//' (!endOfLine .)* :endOfLine
+  BlockComment <- '/*' (!'*/' .)* '*/'
+
+  ##### 7.3 Preprocessing
+  IncludeDirective  < '#include' (('<' HCharSequence '>') | (doublequote QCharSequence doublequote))
+  HCharSequence   <~  (!'>' .)+
+  QCharSequence   <~  (!'\"' .)+
+
+  ### 7.4.13.4.4 8-bits Integers
+
+  # (208)
+  SignedTinyInt <- 'int8'
+
+  # (209)
+  UnsignedTinyInt <- 'uint8'
+
+  ### 7.4.15.4.1 Defining Annotations
+  # (225)
+  AnnotationAppl  < '@' ScopedName ('(' AnnotationApplParams ')')?
+
+  # (226)
+  AnnotationApplParams < ConstExpr | (AnnotationApplParam (',' AnnotationApplParam)*)
+
+  # (227)
+  AnnotationApplParam < Identifier '=' ConstExpr
+
+  ##### Others
+  EscapeSequence <- backslash ( quote
+                              / doublequote
+                              / backslash
+                              / [abfnrtv]
+                              / 'x' HexDigit HexDigit
+                              / 'u' HexDigit HexDigit HexDigit HexDigit
+                              / 'U' HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit
+  )
+  HexDigit < [0-9a-fA-F]
+  DQChar <- EscapeSequence
+          / !doublequote .
+  Integer <- digit+
+  HexadecimalInteger <- ('0x'/'0X') HexDigit+
+  Sign <- ('-'/'+')?
+
