@@ -1,6 +1,9 @@
 name: workflow
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
 
 jobs:

@@ -1,0 +1,29 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-pages:
+    needs: test
+    runs-on: rolling
+    env:
+      ROS_DISTRO: rolling
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: dlang-community/setup-dlang@v1
+        with:
+          compiler: dmd-latest
+      - name: Generate docs
+        run: |
+          rdmd script/gendoc
+      - name: Deploy pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allow_empty_commit: false
+          publish_dir: docs
+          user_name: GitHub Actions Bot
+          user_email: <>
