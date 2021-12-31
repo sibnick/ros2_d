@@ -17,6 +17,8 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${test_interface_files_MSG_FILES}
+  ${test_interface_files_SRV_FILES}
+  ${test_interface_files_ACTION_FILES}
 )
 
 ament_export_dependencies(rosidl_default_runtime)

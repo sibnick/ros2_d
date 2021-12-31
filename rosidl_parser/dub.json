@@ -4,6 +4,7 @@
 	],
 	"copyright": "Copyright © 2021, nonanonno",
 	"dependencies": {
+		"dxml": "~>0.4.3",
 		"pegged": "~>0.4.5",
 		"silly": "~>1.1.1"
 	},
@@ -12,5 +13,17 @@
 	"name": "rosidl_parser",
 	"stringImportPaths": [
 		"resources"
+	],
+	"configurations": [
+		{
+			"name": "library",
+			"targetType": "library"
+		},
+		{
+			"name": "unittest",
+			"dependencies": {
+				"ros2_d:test_helper": "*"
+			}
+		}
 	]
 }

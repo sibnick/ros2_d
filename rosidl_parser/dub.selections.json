@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"dxml": "0.4.3",
 		"pegged": "0.4.5",
 		"silly": "1.1.1"
 	}

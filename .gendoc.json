@@ -3,6 +3,9 @@
         "ros2_d:rcl_bind",
         "ros2_d:test_helper"
     ],
+    "excludePatterns": [
+        ".+_loggerconfig\\.d$"
+    ],
     "sourceDocs": [
         "source_docs",
         "rosidl_parser/source_docs"
