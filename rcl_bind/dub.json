@@ -14,9 +14,9 @@
 		"-L/opt/ros/${ROS_DISTRO}/lib"
 	],
 	"libs": [
-			"rcl",
-			"rcutils",
-			"rosidl_typesupport_c",
-			"rosidl_runtime_c"
+		"rcl",
+		"rcutils",
+		"rosidl_typesupport_c",
+		"rosidl_runtime_c"
 	]
 }

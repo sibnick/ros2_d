@@ -1,7 +1,6 @@
 module rosidl_parser.parser;
 
 import rosidl_parser.definition;
-import rosidl_parser.util;
 import pegged.grammar;
 import std.algorithm.comparison;
 import std.algorithm;
@@ -10,17 +9,87 @@ import std.conv;
 import std.array;
 import std.stdio : writeln;
 
-mixin(grammar(import("rosidl.peg")));
-mixin peggedHelper!"ROSIDL";
+/**
+ * Parse IDL text as Message
+ *
+ * Params:
+ *   text = Input text of IDL file
+ * Returns: IdlFile!Message
+ */
+auto parseAsMessage(string text)
+{
+    auto idl = ROSIDL(text);
+    auto p = new Parser();
+    p.parse(idl);
 
-struct ParsedData
+    assert(p.data.messages.length == 1);
+
+    return IdlFile!Message(p.data.includes, p.data.typedefMap, p.data.messages.values[0]);
+
+}
+
+@("parseAsMessage") unittest
+{
+    auto msg = parseAsMessage(import("test/msg.idl"));
+}
+
+/**
+ * Parse IDL text as Service
+ *
+ * Params:
+ *   text = Input text of IDL file
+ * Returns: IdlFile!Service
+ */
+auto parseAsService(string text)
+{
+    auto idl = ROSIDL(text);
+    auto p = new Parser();
+    p.parse(idl);
+
+    assert(p.data.messages.length == 2);
+
+    return IdlFile!Service(p.data.includes, p.data.typedefMap, new Service(p.data.messages.values));
+}
+
+@("parseAsService") unittest
+{
+    auto msg = parseAsService(import("test/srv.idl"));
+}
+
+/**
+ * Parse IDL text as Action
+ *
+ * Params:
+ *   text = Input text of IDL file
+ * Returns: IdlFile!Action
+ */
+auto parseAsAction(string text)
+{
+    auto idl = ROSIDL(text);
+    auto p = new Parser();
+    p.parse(idl);
+
+    assert(p.data.messages.length == 3);
+
+    return IdlFile!Action(p.data.includes, p.data.typedefMap, new Action(p.data.messages.values));
+}
+
+@("parseAsAction") unittest
+{
+    auto msg = parseAsAction(import("test/action.idl"));
+}
+
+private mixin(grammar(import("rosidl.peg")));
+private mixin peggedHelper!"ROSIDL";
+
+private struct ParsedData
 {
     Message[string] messages;
     Include[] includes;
     AbstractType[AbstractType] typedefMap;
 }
 
-class Parser
+private class Parser
 {
     string[] namespaces;
     ParsedData data;
@@ -300,51 +369,212 @@ private:
 
 }
 
-auto parseAsMessage(string text)
+private mixin template peggedHelper(string prefix)
 {
-    auto idl = ROSIDL(text);
-    auto p = new Parser();
-    p.parse(idl);
+    import pegged.grammar;
 
-    assert(p.data.messages.length == 1);
+    /**
+     * Create a PEG tag with prefix
+     *
+     * Params:
+     *   k = Tag name
+     * Returns: `<prefix>.<k>`
+     */
+    string tag(string k)
+    {
+        import std.array : join;
 
-    return IdlFile!Message(p.data.includes, p.data.typedefMap, p.data.messages.values[0]);
+        return [prefix, k].join(".");
+    }
 
-}
+    /**
+     * Get all child element with name `k`.
+     *
+     * Params:
+     *   p = ParseTree
+     *   k = Target tag name
+     * Returns: A list of extracted child elements.
+     */
+    auto getAll(in ParseTree p, in string k)
+    {
+        import std.algorithm : filter;
+        import std.array : array;
 
-@("parseAsMessage") unittest
-{
-    auto msg = parseAsMessage(import("test/msg.idl"));
-}
+        return p.children.filter!(a => a.name == tag(k)).array;
+    }
 
-auto parseAsService(string text)
-{
-    auto idl = ROSIDL(text);
-    auto p = new Parser();
-    p.parse(idl);
+    /**
+     * Get first child element.
+     *
+     * If `p` does not have any child element, an assertion will be raised.
+     * Params:
+     *   p = ParseTree
+     * Returns: Extracted element.
+     */
+    auto getFirst(in ParseTree p)
+    {
+        assert(p.children.length > 0);
+        return p.children[0];
+    }
 
-    assert(p.data.messages.length == 2);
+    /**
+     * Get `at`-th child element with name `k`.
+     *
+     * If `p` does not have `at`-th `k` child element, an assertion will be raised.
+     * Params:
+     *   p = ParseTree
+     *   k = Target tag name
+     * Returns: Extracted element.
+     */
+    auto getAt(in ParseTree p, in string k, size_t at = 0U)
+    {
+        import std.conv : to;
+        import std.array : array;
 
-    return IdlFile!Service(p.data.includes, p.data.typedefMap, new Service(p.data.messages.values));
-}
+        assert(p.has(k), p.to!string);
+        const all = p.getAll(k).array;
+        assert(all.length > at, all.to!string);
+        return all[at];
+    }
 
-@("parseAsService") unittest
-{
-    auto msg = parseAsService(import("test/srv.idl"));
-}
+    /**
+     * Check if `p` has `k` child element.
+     *
+     * Params:
+     *   p = ParseTree
+     *   k = Target tag name
+     * Returns: Check result
+     */
+    bool has(in ParseTree p, in string k)
+    {
+        import std.algorithm : any;
 
-auto parseAsAction(string text)
-{
-    auto idl = ROSIDL(text);
-    auto p = new Parser();
-    p.parse(idl);
+        return p.children.any!(a => a.name == tag(k));
+    }
 
-    assert(p.data.messages.length == 3);
+    /**
+     * Get matched data as a string.
+     *
+     * If `p` still has multiple child element, this function just concat its string.
+     *
+     * Params:
+     *   p = ParseTree
+     * Returns: Extracted string
+     */
+    string getData(in ParseTree p)
+    {
+        import std.array : join;
 
-    return IdlFile!Action(p.data.includes, p.data.typedefMap, new Action(p.data.messages.values));
-}
+        return p.matches[].join("");
+    }
 
-@("parseAsAction") unittest
-{
-    auto msg = parseAsAction(import("test/action.idl"));
+    /**
+     * Search tag name recursively
+     *
+     * This function finds `k` with depth-wise searching. If the tag is not found, an assertion will be raised.
+     * Params:
+     *   p = ParseTree
+     *   k =Target tag name
+     * Returns: Extracted element.
+     */
+    auto searchFirst(in ParseTree p, in string k)
+    {
+        import std.conv : to;
+
+        ParseTree ret;
+        bool impl(in ParseTree pp)
+        {
+            if (pp.has(k))
+            {
+                ret = pp.getAt(k).dup;
+                return true;
+            }
+            else
+            {
+                foreach (c; pp.children)
+                {
+                    if (impl(c))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        auto found = impl(p);
+
+        assert(found, p.to!string);
+        return ret;
+    }
+
+    /**
+     * Match function for ParseTree.
+     *
+     * `choices` field is a list of combination of key and delegate. Key is a tag for PEG and used
+     * with <prefix>. Delegate need to have an argument for `in ParseTree` and can return any types.
+     * including void.
+     * If the number of `choices` is odd, the last delegate will be a default rule. If no default
+     * choice is specified and no choices are matched, an assertion will be raised.
+     *
+     * Examples:
+     * ----------
+     * // Print "Matched Foo" if p.name == `"<prefix>.Foo"`.
+     * treeMatch(p,
+     *   "Foo", (in ParseTree p) { writeln("Matched Foo", p); },
+     *   "Bar", (in ParseTree p) { writeln("Matched Bar", p); },
+     * );
+     *
+     * // Return a string
+     * auto ret = treeMatch(p,
+     *   "Foo", (in ParseTree p) { return "Matched Foo"; },
+     *   "Bar", (in ParseTree p) { return "Matched Bar"; },
+     * );
+     * ----------
+     * Params:
+     *   p = ParseTree
+     *   choices = A list of combination of key and delegate
+     */
+    auto treeMatch(R...)(in ParseTree p, lazy R choices)
+    {
+        import core.exception : SwitchError;
+
+        foreach (index, ChoiceType; R)
+        {
+            static if (index % 2 == 1)
+            {
+                if (p.name == tag(choices[index - 1]))
+                {
+                    static if (is(typeof(choice[index]()(p)) == void))
+                    {
+                        choices[index]()(p);
+                        return;
+                    }
+                    else
+                    {
+                        return choices[index]()(p);
+                    }
+                }
+            }
+
+        }
+
+        static if (R.length % 2 == 1)
+        {
+            static if (is(typeof(choice[index]()(p)) == void))
+            {
+                choices[$ - 1]()(p);
+                return;
+            }
+            else
+            {
+                return choices[$ - 1]()(p);
+            }
+        }
+        else
+        {
+            assert(false, p.name);
+        }
+    }
+
 }

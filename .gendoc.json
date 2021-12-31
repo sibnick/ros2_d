@@ -1,0 +1,10 @@
+{
+    "excludePackages": [
+        "ros2_d:rcl_bind",
+        "ros2_d:test_helper"
+    ],
+    "sourceDocs": [
+        "source_docs",
+        "rosidl_parser/source_docs"
+    ]
+}

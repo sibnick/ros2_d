@@ -11,4 +11,4 @@ docs/
 ament/build
 ament/install
 ament/log
-ament/src/test_interfaces_files
+ament/src/test_interface_files

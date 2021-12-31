@@ -30,7 +30,10 @@ void main()
         "test_helper/ament/build",
         "test_helper/ament/install",
         "test_helper/ament/log",
-        "test_helper/ament/src/test_interfaces"
+        "test_helper/ament/src/test_interfaces",
+        "rcl_bind/.dub",
+        "rcl_bind/libros2_d_rcl_bind.a",
+        "docs"
     ];
     format!"rm -rf %-(%s %)"(items).run;
     "rm -rf -- *.lst".run;

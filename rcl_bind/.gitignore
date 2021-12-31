@@ -1,2 +1,3 @@
 .dub
 source/rcl/package.d
+libros2_d_rcl_bind*
