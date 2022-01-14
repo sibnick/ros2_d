@@ -20,7 +20,8 @@ ROSIDL:
   ModuleDcl    < AnnotationAppl* 'module' Identifier '{' Definition+ '}'
 
   # (4)
-  ScopedName   < (Identifier | ('::' Identifier) | (ScopedName '::' Identifier))
+  ScopedName < Identifier | ('::' Identifier) | (ScopedName '::' Identifier)
+
 
   #### 7.4.1.4.3 Constants
 
@@ -28,7 +29,7 @@ ROSIDL:
   ConstDcl     < AnnotationAppl* 'const' ConstType Identifier '=' ~ConstExpr
 
   # (6)
-  ConstType    < (
+  ConstType <
     / FloatingPtType
     / IntegerType
     / FixedPtConstType
@@ -39,40 +40,39 @@ ROSIDL:
     / StringType
     / WideStringType
     / ScopedName
-  )
 
   # (7)
   ConstExpr    <~ OrExpr
 
   # (8)
-  OrExpr  < (XorExpr / (OrExpr '|' XorExpr))
+  OrExpr  < XorExpr | (OrExpr '|' XorExpr)
 
   # (9)
-  XorExpr < (AndExpr / (XorExpr '^' AndExpr))
+  XorExpr < AndExpr | (XorExpr '^' AndExpr)
 
   # (10)
-  AndExpr < (ShiftExpr / (AndExpr '&' ShiftExpr))
+  AndExpr < ShiftExpr | (AndExpr '&' ShiftExpr)
 
   # (11)
-  ShiftExpr < (AddExpr / (ShiftExpr '>>' AddExpr) / (ShiftExpr '<<' AddExpr))
+  ShiftExpr < AddExpr | (ShiftExpr '>>' AddExpr) | (ShiftExpr '<<' AddExpr)
 
   # (12)
-  AddExpr   < (MultiExpr / (AddExpr '+' MultiExpr) / (AddExpr '-' MultiExpr))
+  AddExpr   < MultiExpr | (AddExpr '+' MultiExpr) | (AddExpr '-' MultiExpr)
 
   # (13)
-  MultiExpr < (UnaryExpr / (MultiExpr '*' UnaryExpr) / (MultiExpr '/' UnaryExpr) / (MultiExpr '%' UnaryExpr))
+  MultiExpr < UnaryExpr | (MultiExpr '*' UnaryExpr) | (MultiExpr '/' UnaryExpr) | (MultiExpr '%' UnaryExpr)
 
   # (14)
-  UnaryExpr < ((UnaryOperator PrimaryExpr) / PrimaryExpr)
+  UnaryExpr < (UnaryOperator PrimaryExpr) | PrimaryExpr
 
   # (15)
-  UnaryOperator < ('-' / '+' / '~')
+  UnaryOperator < '-' / '+' / '~'
 
   # (16)
-  PrimaryExpr < (ScopedName | Literal | ('(' ConstExpr ')'))
+  PrimaryExpr < ScopedName | Literal | ('(' ConstExpr ')')
 
   # (17)
-  Literal       < (
+  Literal <
     | IntegerLiteral
     | FloatingPtLiteral
     | FixedPtLiteral
@@ -81,10 +81,9 @@ ROSIDL:
     | BooleanLiteral
     | StringLiterals
     | WideStringLiterals
-  )
 
   # (18) lowercases are added
-  BooleanLiteral  <- BooleanLiteralTrue / BooleanLiteralFalse
+  BooleanLiteral <- BooleanLiteralTrue / BooleanLiteralFalse
   # separate rules
   BooleanLiteralTrue <- 'TRUE' / 'true'
   BooleanLiteralFalse <- 'FALSE' / 'false'
@@ -121,36 +120,36 @@ ROSIDL:
   )
 
   # (24)
-  FloatingPtType  < ('float' | 'double' | ('long' 'double'))
+  FloatingPtType < 'float' / 'double' / 'long' 'double'
 
   # (25)
-  IntegerType  < (SignedInt | UnsignedInt)
+  IntegerType < SignedInt / UnsignedInt
 
   # (26), (206)
-  SignedInt < (SignedShortInt | SignedLongInt | SignedLonglongInt | SignedTinyInt)
+  SignedInt < SignedShortInt /  SignedLonglongInt / SignedLongInt / SignedTinyInt
 
-  # (27), (210)
-  SignedShortInt < 'short' | 'int16'
+    # (27), (210)
+  SignedShortInt < 'short' / 'int16'
 
   # (28), (211)
-  SignedLongInt < 'long' | 'int32'
+  SignedLongInt < 'long' / 'int32'
 
   # (29), (212)
-  SignedLonglongInt < ('long' 'long') | 'int64'
+  SignedLonglongInt < 'long' 'long' / 'int64'
 
   # (30), (207)
-  UnsignedInt < (UnsignedShortInt | UnsignedLongInt | UnsignedLonglongInt | UnsignedTinyInt)
+  UnsignedInt < UnsignedShortInt / UnsignedLonglongInt / UnsignedLongInt / UnsignedTinyInt
 
   # (31), (213)
-  UnsignedShortInt < ('unsigned' 'short') | 'uint16'
+  UnsignedShortInt < 'unsigned' 'short' / 'uint16'
 
   # (32), (214)
-  UnsignedLongInt  < ('unsigned' 'long') | 'uint32'
+  UnsignedLongInt  < 'unsigned' 'long' / 'uint32'
 
   # (33), (215)
-  UnsignedLonglongInt < ('unsigned' 'long' 'long') | 'uint64'
+  UnsignedLonglongInt < 'unsigned' 'long' 'long' / 'uint64'
 
-  # (34)
+    # (34)
   CharType  < 'char'
 
   # (35)
@@ -176,10 +175,10 @@ ROSIDL:
   SequenceType  < (('sequence' '<' TypeSpec ',' PositiveIntConst '>') / ('sequence' '<' TypeSpec '>'))
 
   # (40)
-  StringType  < (('string' '<' PositiveIntConst '>') / 'string')
+  StringType  < ('string' '<' PositiveIntConst '>') / 'string'
 
   # (41)
-  WideStringType  < (('wstring' '<' PositiveIntConst '>') / 'wstring')
+  WideStringType  < ('wstring' '<' PositiveIntConst '>') / 'wstring'
 
   # (42)
   FixedPtType < 'fixed' '<' PositiveIntConst ',' PositiveIntConst '>'
@@ -269,29 +268,28 @@ ROSIDL:
   IntegerLiteral <- HexadecimalInteger / Integer
 
   #### 7.2.6.2 Character Literals
-  CharacterLiteral <- quote (!quote (EscapeSequence / .)) quote
-  WideCharacterLiteral <- 'L' CharacterLiteral
-
+  CharacterLiteral <~ quote (!quote (EscapeSequence / .)) quote
+  WideCharacterLiteral <~ 'L' CharacterLiteral
 
   #### 7.2.6.3 String Literals
-  # adjacent string literals are concatenated
-  StringLiteral <- doublequote (DQChar)* doublequote
-  WideStringLiteral <- 'L' StringLiteral
+  StringLiteral <~ doublequote (EscapeSequence / !doublequote .)* doublequote
+  WideStringLiteral <~ 'L' StringLiteral
   StringLiterals < StringLiteral+
   WideStringLiterals < WideStringLiteral+
 
   #### 7.2.6.4 Floating-point Literals
-  FloatingPtLiteral <-
-    / Integer '.' Integer? (('e'/'E') Sign? Integer)?
-    / '.' Integer (('e'/'E') Sign? Integer)?
-    / Integer (('e'/'E') Sign? Integer)
+  FloatingPtLiteral <~
+      / Integer '.' Integer? (('e' / 'E') Sign? Integer)?
+      / '.' Integer (('e' / 'E') Sign? Integer)?
+      / Integer (('e' / 'E') Sign? Integer)?
 
-  #### 7.2.6.5 Fixed-Point Literals
-  FixedPtLiteral <- ((Integer '.' Integer?) / ('.' Integer)) ('d' / 'D')
+  #### 7.2.6.5 Fixed-point Literals
+  FixedPtLiteral <~ ((Integer '.' Integer) / ('.' Integer)) ('d' / 'D')
+
 
   ##### 7.2.2 Comments
   Spacing <: (space / endOfLine / Comment)*
-  Comment <- (LineComment | BlockComment)
+  Comment <- LineComment | BlockComment
   LineComment <- '//' (!endOfLine .)* :endOfLine
   BlockComment <- '/*' (!'*/' .)* '*/'
 
@@ -319,18 +317,15 @@ ROSIDL:
   AnnotationApplParam < Identifier '=' ConstExpr
 
   ##### Others
-  EscapeSequence <- backslash ( quote
-                              / doublequote
-                              / backslash
-                              / [abfnrtv]
-                              / 'x' HexDigit HexDigit
-                              / 'u' HexDigit HexDigit HexDigit HexDigit
-                              / 'U' HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit
+  Integer <~ digit+
+  HexadecimalInteger <~ ('0x' / '0X')  hexDigit+
+  Sign <- '-' / '+'
+  EscapeSequence <~ backslash (
+    / quote
+    / doublequote
+    / backslash
+    / [abfnrtv]
+    / 'x' hexDigit hexDigit
+    / 'u' hexDigit hexDigit hexDigit hexDigit
+    / 'U' hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit hexDigit
   )
-  HexDigit < [0-9a-fA-F]
-  DQChar <- EscapeSequence
-          / !doublequote .
-  Integer <- digit+
-  HexadecimalInteger <- ('0x'/'0X') HexDigit+
-  Sign <- ('-'/'+')?
-
