@@ -9,6 +9,7 @@ import msg_gen.util;
 import std.conv;
 import std.experimental.logger;
 import msg_gen.logging;
+import rosidl_parser;
 
 @CommandDefault("Generate DUB dependencies from ROS2 message packages.")
 struct GenerateDUBDependencies
@@ -31,7 +32,7 @@ struct GenerateDUBDependencies
 
         stdThreadLocalLog.logLevel = logLevel;
 
-        const manifests = findMessagePackages();
+        const manifests = findROSIDLPackagesFromEnvironmentVariable();
 
         if (dry_run.get(false))
         {
@@ -40,7 +41,7 @@ struct GenerateDUBDependencies
             {
                 const pkgName = m.packageName;
                 const pkgPath = buildPath(m.installDirectory, "share", pkgName);
-                const msgNum = m.message.messages.length.to!string;
+                const msgNum = m.messageFiles.length.to!string;
                 const outDir = buildPath(output, pkgName ~ "-" ~ m.version_);
                 matrix ~= [
                     "Found", pkgName.style(mode.bold), "at", pkgPath, "with",

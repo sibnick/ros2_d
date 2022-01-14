@@ -64,19 +64,20 @@ Manifest[] findROSIDLPackages(string amentPrefix)
         manifest.packageName = pkg.getFirst("name").getData;
         manifest.version_ = pkg.getFirst("version").getData;
         manifest.installDirectory = amentPrefix;
+        // TODO: need to parse subdirectory's files
         if (buildPath(dir, "msg").exists)
         {
-            manifest.messageFiles = dirEntries(buildPath(dir, "msg"), "*.idl", SpanMode.depth)
+            manifest.messageFiles = dirEntries(buildPath(dir, "msg"), "*.idl", SpanMode.shallow)
                 .map!(d => d.name).array;
         }
         if (buildPath(dir, "srv").exists)
         {
-            manifest.serviceFiles = dirEntries(buildPath(dir, "srv"), "*.idl", SpanMode.depth)
+            manifest.serviceFiles = dirEntries(buildPath(dir, "srv"), "*.idl", SpanMode.shallow)
                 .map!(d => d.name).array;
         }
         if (buildPath(dir, "action").exists)
         {
-            manifest.actionFiles = dirEntries(buildPath(dir, "action"), "*.idl", SpanMode.depth)
+            manifest.actionFiles = dirEntries(buildPath(dir, "action"), "*.idl", SpanMode.shallow)
                 .map!(d => d.name).array;
         }
         manifests ~= manifest;

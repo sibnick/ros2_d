@@ -3,33 +3,48 @@ module msg_gen.generator;
 import mustache;
 import std.file;
 import std.path;
+import std.array;
+import std.algorithm;
+import std.algorithm.comparison;
 
-import msg_gen.rosidl.manifest;
-import msg_gen.renderers;
+import rosidl_parser;
+import msg_gen.renderers.d : renderMessageD = renderMessage;
+import msg_gen.renderers.c : renderMessageC = renderMessage;
+import msg_gen.renderers.dub;
 
-void generateDUB(in Manifest m, string outDir)
+void generateDUB(in Manifest manifest, string outDir)
 {
-    MustacheEngine!string mustache;
-    const pkgRoot = buildPath(outDir, m.packageName);
+    const pkgRoot = buildPath(outDir, manifest.packageName);
     mkdirRecurse(pkgRoot);
-    write(buildPath(pkgRoot, "dub.json"), renderDUB(mustache, m));
 
-    if (m.hasMessages)
+    Include[] includes;
+
+    auto msgs = manifest.messageFiles.map!(f => parseAsMessage(readText(f))).array;
+    if (msgs)
     {
-        const srcDir = buildPath(pkgRoot, "source", m.packageName);
+        const srcDir = buildPath(pkgRoot, "source", manifest.packageName);
         mkdirRecurse(buildPath(srcDir, "c"));
-        write(buildPath(srcDir, "msg.d"), renderD(mustache, m.message));
-        write(buildPath(srcDir, "c", "msg.d"), renderC(mustache, m.message));
+        write(buildPath(srcDir, "msg.d"), renderMessageD(manifest.packageName, msgs));
+        write(buildPath(srcDir, "c", "msg.d"), renderMessageC(manifest.packageName, msgs));
     }
+    includes ~= msgs.map!(m => m.includes).join();
+
+    auto depends = makeUniqueDepends(includes, [manifest.packageName]);
+
+    write(buildPath(pkgRoot, "dub.json"), renderDUB(manifest, depends));
+
 }
 
 @("generateDUB test_msgs") unittest
 {
-    import test_helper.test_msgs : TestMsgsData, TestMsgs;
     import test_helper.utils;
-    import msg_gen.test_helper;
+    import test_helper.ament : amentPrefixPath;
 
-    import msg_gen.rosidl.type;
+    auto manifests = findROSIDLPackages(amentPrefixPath);
+    assert(manifests.length == 1);
+    auto manifest = manifests[0];
+
+    auto name = manifest.packageName;
 
     const tempDir = makeUniqTemp;
 
@@ -39,11 +54,7 @@ void generateDUB(in Manifest m, string outDir)
         rmdirRecurse(tempDir);
     }
 
-    const name = TestMsgs.name;
-
-    const m = Manifest(name, TestMsgs.version_, "install/" ~ name ~ "/lib", fromTestMsgs);
-
-    generateDUB(m, tempDir);
+    generateDUB(manifest, tempDir);
 
     const dubRoot = buildPath(tempDir, name);
 
@@ -54,37 +65,8 @@ void generateDUB(in Manifest m, string outDir)
     assert(exists(dubPath));
     assert(exists(dMsgPath));
     assert(exists(cMsgPath));
-
-    const dub = readText(dubPath);
-    const dMsg = readText(dMsgPath);
-    const cMsg = readText(cMsgPath);
-
-    assert(dub == import("test/output/test_msgs/dub.json"), dub);
-    assert(dMsg == import("test/output/test_msgs/source/test_msgs/msg.d"), dMsg);
-    assert(cMsg == import("test/output/test_msgs/source/test_msgs/c/msg.d"), cMsg);
 }
 
-/**
- * Generate DUB package as a dependent module.
- *
- * This function generates a directory which can be recognized as a dependent module.
- * This will produce the following directory tree.
- * ---
- * <outDir>
- * +- <packageName>-<version>
- *    +- <packageName>.lock
- *    +- <packageName>
- *       +- dub.json
- *       +- source
- *          +- <packageName>
- *             +- msg.d
- *             +- c
- *                +- msg.d
- * ---
- * Params:
- *   m = Manifest
- *   outDir = Output directory
- */
 void generateDUBAsDepend(in Manifest m, string outDir)
 {
     const dir = buildPath(outDir, m.packageName ~ "-" ~ m.version_);
@@ -95,40 +77,23 @@ void generateDUBAsDepend(in Manifest m, string outDir)
     generateDUB(m, dir);
 }
 
-@("generateDUB test_msgs") unittest
+private string[] makeUniqueDepends(Include[] includes, string[] ignoreList)
 {
-    import test_helper.test_msgs : TestMsgsData, TestMsgs;
-    import test_helper.utils;
-    import msg_gen.test_helper;
+    return includes
+        .map!(i => i.locator[1 .. $ - 1]) // trim bracket
+        .map!(i => i.split('/')[0]) // get module name
+        .array // to array to sort
+        .sort // sort to apply uniq
+        .uniq // get uniq
+        .filter!(i => !ignoreList.canFind(i)) // delete items appeared in ignoreList
+        .array; // to array
+}
 
-    import msg_gen.rosidl.type;
-
-    const tempDir = makeUniqTemp;
-
-    scope (exit)
-    {
-        assert(exists(tempDir));
-        rmdirRecurse(tempDir);
-    }
-
-    const name = TestMsgs.name;
-    const version_ = TestMsgs.version_;
-
-    const m = Manifest(name, version_, "install/" ~ name ~ "/lib", fromTestMsgs);
-    generateDUBAsDepend(m, tempDir);
-
-    const depRoot = buildPath(tempDir, name ~ "-" ~ version_);
-    const lockPath = buildPath(depRoot, name ~ ".lock");
-
-    const dubRoot = buildPath(depRoot, name);
-
-    const dubPath = buildPath(dubRoot, "dub.json");
-    const dMsgPath = buildPath(dubRoot, "source", name, "msg.d");
-    const cMsgPath = buildPath(dubRoot, "source", name, "c", "msg.d");
-
-    assert(exists(lockPath));
-    assert(exists(dubPath));
-    assert(exists(dMsgPath));
-    assert(exists(cMsgPath));
-
+@("makeUniqueDepends") unittest
+{
+    assert(makeUniqueDepends([
+            Include(`"pkgname/msg/MyMessage.idl"`),
+            Include(`"pkgname/msg/MyMessage2.idl"`),
+            Include(`"this/msg/MyMessage.idl"`)
+        ], ["this"]) == ["pkgname"]);
 }

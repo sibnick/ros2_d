@@ -22,7 +22,7 @@ auto parseAsMessage(string text)
     auto p = new Parser();
     p.parse(idl);
 
-    assert(p.data.messages.length == 1);
+    assert(p.data.messages.length == 1, text);
 
     return IdlFile!Message(p.data.includes, p.data.typedefMap, p.data.messages.values[0]);
 
@@ -311,7 +311,7 @@ private:
             .map!(c => getAnyDeclarator(c))
             .each!((c) {
                 auto key = new NamespacedType(namespaces, c[0]);
-                assert(key !in data.typedefMap);
+                assert(key !in data.typedefMap, key.to!string ~ " -> " ~ data.typedefMap.to!string);
                 if (c[1])
                 {
                     data.typedefMap[key] = new ArrayType(cast(AbstractNestableType) typeSpec, c[1]);

@@ -342,7 +342,7 @@ private mixin template makeToHash(args...)
             auto __h = super.toHash();
             foreach (__a; args)
             {
-                //__h ^= hashOf(__a);
+                __h ^= hashOf(__a);
             }
             return __h;
         }

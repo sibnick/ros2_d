@@ -9,7 +9,8 @@
 		"jcli": "~>0.24.0",
 		"mustache-d": "~>0.1.5",
 		"pegged": "~>0.4.5",
-		"silly": "~>1.1.1"
+		"silly": "~>1.1.1",
+		"ros2_d:rosidl_parser": "*"
 	},
 	"description": "ROS2 message generator",
 	"license": "Apache-2.0",
@@ -28,5 +29,8 @@
 				"ros2_d:test_helper": "*"
 			}
 		}
+	],
+	"versions": [
+		"$ROS_DISTRO"
 	]
 }

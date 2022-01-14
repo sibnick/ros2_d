@@ -102,7 +102,7 @@ ROSIDL:
   ### 7.4.1.4.4.1 Referencing Types
 
   # (21), (216)
-  TypeSpec  <- TemplateTypeSpec / SimpleTypeSpec
+  TypeSpec  <- TemplateTypeSpec | SimpleTypeSpec
 
   # (22)
   SimpleTypeSpec  <- BaseTypeSpec | ScopedName

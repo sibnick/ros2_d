@@ -1,39 +1,38 @@
 module msg_gen.renderers.dub;
 
+import rosidl_parser;
 import mustache;
-import msg_gen.rosidl.manifest;
-import msg_gen.rosidl.type;
-import msg_gen.util;
+import std.array;
+import std.algorithm;
+import std.algorithm.comparison;
+import std.format;
+import std.stdio;
 
-private enum tmpl = import("renderers/pkg/dub.mustache");
-
-template Context(T)
+string renderDUB(in Manifest manifest, string[] depends)
 {
-    alias Context = MustacheEngine!T.Context;
-}
+    auto cxt = new MustacheEngine!string.Context;
+    cxt["package_name"] = manifest.packageName;
+    cxt["version"] = manifest.version_;
+    cxt["installDirectory"] = manifest.installDirectory;
 
-string render(T)(MustacheEngine!T mustache, in Manifest m)
-{
-    auto cxt = new Context!T();
-    cxt["package_name"] = m.packageName;
-    cxt["version"] = m.version_;
-    cxt["installDirectory"] = m.installDirectory;
-    foreach (d; m.depends)
+    foreach (d; depends)
     {
         cxt.addSubContext("depends")["name"] = d;
     }
 
-    return mustache.renderString(tmpl, cxt).trimTrailingWhitespace();
+    MustacheEngine!string mustache_;
+
+    return mustache_.renderString(import("renderers/pkg/dub.mustache"), cxt);
 }
 
-@("render") unittest
+@("renderDUB") unittest
 {
     import test_helper.test_msgs : TestMsgs;
 
-    const m = Manifest(TestMsgs.name, TestMsgs.version_, "install/test_msgs/lib", MessageModule(
-            TestMsgs.name ~ "::msg"));
+    const m = Manifest(TestMsgs.name, TestMsgs.version_, "install/test_msgs/lib", [
+        ], [], []);
     MustacheEngine!string mustache;
-    const answer = render(mustache, m);
+    const answer = renderDUB(m, []);
     const reference = import("test/output/test_msgs/dub.json");
     assert(answer == reference, answer);
 }
