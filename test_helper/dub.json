@@ -3,6 +3,9 @@
 		"nonanonno"
 	],
 	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"pegged": "~>0.4.5"
+	},
 	"description": "test_helper",
 	"license": "Apache-2.0",
 	"name": "test_helper",

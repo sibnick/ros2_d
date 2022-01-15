@@ -30,7 +30,19 @@ auto parseAsMessage(string text)
 
 @("parseAsMessage") unittest
 {
-    auto msg = parseAsMessage(import("test/msg.idl"));
+    import test_helper.test_msgs;
+    import std.format;
+
+    static foreach (type; __traits(allMembers, TestMsgs.Msg))
+    {
+        {
+            const reference = mixin(format!"TestMsgsData.Msg.%s"(type));
+            const answer = parseAsMessage(mixin(format!"TestMsgs.Msg.%s"(type)));
+
+            validateMessage(answer.data, reference);
+        }
+    }
+
 }
 
 /**
@@ -53,7 +65,21 @@ auto parseAsService(string text)
 
 @("parseAsService") unittest
 {
-    auto msg = parseAsService(import("test/srv.idl"));
+    import test_helper.test_msgs;
+    import std.format;
+
+    static foreach (type; __traits(allMembers, TestMsgs.Srv))
+    {
+        {
+            const reference = mixin(format!"TestMsgsData.Srv.%s"(type));
+            const answer = parseAsService(mixin(format!"TestMsgs.Srv.%s"(type)));
+
+            assert(answer.data.type.name == reference.name);
+
+            validateMessage(answer.data.request, reference.request);
+            validateMessage(answer.data.response, reference.response);
+        }
+    }
 }
 
 /**
@@ -76,7 +102,63 @@ auto parseAsAction(string text)
 
 @("parseAsAction") unittest
 {
-    auto msg = parseAsAction(import("test/action.idl"));
+    import test_helper.test_msgs;
+    import std.format;
+
+    static foreach (type; __traits(allMembers, TestMsgs.Action))
+    {
+        {
+            const reference = mixin(format!"TestMsgsData.Action.%s"(type));
+            const answer = parseAsAction(mixin(format!"TestMsgs.Action.%s"(type)));
+
+            assert(answer.data.type.name == reference.name);
+
+            validateMessage(answer.data.goal, reference.goal);
+            validateMessage(answer.data.result, reference.result);
+            validateMessage(answer.data.feedback, reference.feedback);
+
+            assert(answer.data.sendGoalService.type.name == reference.sendGoalService.name);
+            validateMessage(answer.data.sendGoalService.request,
+                reference.sendGoalService.request);
+            validateMessage(answer.data.sendGoalService.response,
+                reference.sendGoalService.response);
+
+            assert(answer.data.getResultService.type.name == reference.getResultService.name);
+            validateMessage(answer.data.getResultService.request,
+                reference.getResultService.request);
+            validateMessage(answer.data.getResultService.response,
+                reference.getResultService.response);
+
+            validateMessage(answer.data.feedbackMessage, reference.feedbackMessage);
+        }
+    }
+}
+
+version (unittest)
+{
+    void validateMessage(T, U)(T a, U b)
+    {
+        auto as = a.structure;
+        auto bs = b.structure;
+        auto ac = a.constants;
+        auto bc = b.constants;
+
+        assert(as.namespacedType.name == bs.name, a.to!string ~ " <-> " ~ b.to!string);
+        assert(as.members.length == bs.members.length, a.to!string ~ "<->" ~ b.to!string);
+        foreach (i; 0 .. bs.members.length)
+        {
+            assert(as.members[i].name == bs.members[i].name,
+                as.members[i].to!string ~ "<->" ~ bs.members[i].to!string ~ " @" ~ bs
+                    .name);
+        }
+
+        assert(ac.length == bc.length, a.to!string ~ "<->" ~ b.to!string);
+        foreach (i; 0 .. bc.length)
+        {
+            assert(ac[i].name == bc[i].name, ac[i].to!string ~ "<->" ~ bc[i].to!string ~ " @" ~ bs
+                    .name);
+        }
+    }
 }
 
 private mixin(grammar(import("rosidl.peg")));
@@ -311,7 +393,8 @@ private:
             .map!(c => getAnyDeclarator(c))
             .each!((c) {
                 auto key = new NamespacedType(namespaces, c[0]);
-                assert(key !in data.typedefMap, key.to!string ~ " -> " ~ data.typedefMap.to!string);
+                // Do not check because there are some cases which have same typedef declaration
+                //assert(key !in data.typedefMap, key.to!string ~ " -> " ~ data.typedefMap.to!string);
                 if (c[1])
                 {
                     data.typedefMap[key] = new ArrayType(cast(AbstractNestableType) typeSpec, c[1]);
@@ -355,18 +438,6 @@ private:
             return Annotation(name, null);
         }
     }
-
-    @("parse") unittest
-    {
-        auto parser = new Parser();
-        parser.parse(ROSIDL(import("test/msg.idl")));
-
-        auto data = parser.data;
-        assert(data.messages.length == 1);
-        assert(data.messages.values[0].constants.length == 7);
-
-    }
-
 }
 
 private mixin template peggedHelper(string prefix)

@@ -72,18 +72,6 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
         msgs ~= parseAsMessage(readText(f));
     }
 
-    version (rolling)
-    {
-        enum msgsNum = 12;
-    }
-    else
-    {
-        enum msgsNum = 11;
-    }
-
-    assert(msgs.length == msgsNum, msgs.map!(m => m.data.structure.namespacedType)
-            .to!string);
-
     assert(renderMessage(manifest.packageName, msgs).length > 100);
 }
 
@@ -463,7 +451,6 @@ AbstractType solveType(string packageName, AbstractType type, AbstractType[Abstr
         nst(ns, "test_msgs__msg__BasicTypes"): nst(ns, "BasicTypes"),
         nst(ns, "test_msgs__msg__BasicTypes__3"): at(nt("test_msgs__msg__BasicTypes"), "3"),
     ];
-    import std.stdio;
 
     assert(solveType("test_msgs", bt("float"), map) == bt("float"));
     assert(solveType("test_msgs", nt("boolean__3"), map) == at(bt("boolean"), "3"));

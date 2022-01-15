@@ -3,6 +3,7 @@ docs.json
 __dummy.html
 docs/
 /test_helper*
+/ros2_d*
 *.a
 *.exe
 *.o

@@ -65,17 +65,6 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
         msgs ~= parseAsMessage(readText(f));
     }
 
-    version (rolling)
-    {
-        enum msgsNum = 12;
-    }
-    else
-    {
-        enum msgsNum = 11;
-    }
-
-    assert(msgs.length == msgsNum);
-
     assert(renderMessage(manifest.packageName, msgs).length > 100);
 }
 
