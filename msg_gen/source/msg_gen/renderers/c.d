@@ -24,26 +24,7 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
     foreach (msg; msgs)
     {
         auto message = msg.data;
-        auto messageCxt = cxt.addSubContext("messages");
-        auto struct_ = message.structure;
-        messageCxt["name"] = struct_.namespacedType.toCTypeName;
-        messageCxt["arrayName"] = new UnboundedSequence(struct_.namespacedType).toCTypeName;
-
-        foreach (member; struct_.members)
-        {
-            auto memberCxt = messageCxt.addSubContext("members");
-
-            if (auto named = cast(NamedType) member.type)
-            {
-                auto namespaced = new NamespacedType([packageName, "msg"], named.name);
-                memberCxt["type"] = msg.typedefMap.get(namespaced, member.type).toCTypeName;
-            }
-            else
-            {
-                memberCxt["type"] = member.type.toCTypeName;
-            }
-            memberCxt["name"] = member.name;
-        }
+        addMessageCxt(cxt, msg, msg.data, [packageName, "msg"]);
 
     }
     MustacheEngine!string mustache_;
@@ -66,6 +47,76 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
     }
 
     assert(renderMessage(manifest.packageName, msgs).length > 100);
+}
+
+string renderService(string packageName, IdlFile!Service[] srvs)
+{
+    // Operate as messages
+
+    auto cxt = new MustacheEngine!string.Context;
+    cxt["moduleName"] = packageName ~ ".c.srv";
+
+    auto includes = srvs.map!(s => s.includes).join();
+    auto uniqueIncludes = makeUniqueIncludes(includes, [packageName ~ ".c.srv"]);
+    foreach (include; uniqueIncludes)
+    {
+        cxt.addSubContext("depends")["name"] = include;
+    }
+
+    foreach (srv; srvs)
+    {
+        auto serviceCxt = cxt.addSubContext("services");
+        serviceCxt["name"] = srv.data.type.toCTypeName;
+
+        addMessageCxt(serviceCxt, srv, srv.data.request, [packageName, "srv"]);
+        addMessageCxt(serviceCxt, srv, srv.data.response, [packageName, "srv"]);
+    }
+    MustacheEngine!string mustache_;
+
+    // Use msg
+    return mustache_.renderString(import("renderers/pkg/source/pkg/c/srv.mustache"), cxt);
+}
+
+@("renderService") unittest
+{
+    import std : readText, writeln;
+    import test_helper.ament : amentPrefixPath;
+
+    auto manifests = findROSIDLPackages(amentPrefixPath);
+    assert(manifests.length == 1);
+    auto manifest = manifests[0];
+    IdlFile!Service[] srvs;
+    foreach (f; manifest.serviceFiles)
+    {
+        srvs ~= parseAsService(readText(f));
+    }
+
+    assert(renderService(manifest.packageName, srvs).length > 100);
+}
+
+private void addMessageCxt(T, U)(MustacheEngine!T.Context cxt, IdlFile!U idl, Message message, string[] namespace)
+{
+    auto messageCxt = cxt.addSubContext("messages");
+    auto struct_ = message.structure;
+    messageCxt["name"] = struct_.namespacedType.toCTypeName;
+    messageCxt["arrayName"] = new UnboundedSequence(struct_.namespacedType).toCTypeName;
+
+    foreach (member; struct_.members)
+    {
+        auto memberCxt = messageCxt.addSubContext("members");
+
+        if (auto named = cast(NamedType) member.type)
+        {
+            auto namespaced = new NamespacedType(namespace, named.name);
+            memberCxt["type"] = idl.typedefMap.get(namespaced, member.type).toCTypeName;
+        }
+        else
+        {
+            memberCxt["type"] = member.type.toCTypeName;
+        }
+        memberCxt["name"] = member.name;
+    }
+
 }
 
 private string[] makeUniqueIncludes(Include[] includes, string[] ignoreList)

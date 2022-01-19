@@ -27,7 +27,7 @@ import std.format;
     auto pubMsg = String(text);
     assertNotThrown(pub.publish(pubMsg));
 
-    assert(executor.spinOnce(100.msecs));
+    assert(executor.spinSome(100.msecs));
 
     assert(text == received, received);
 }
@@ -47,7 +47,7 @@ import std.format;
     string received;
     sub.setCallback(delegate(in String msg) { received = msg.data; });
 
-    assert(!executor.spinOnce(100.msecs));
+    assert(!executor.spinSome(100.msecs));
 }
 
 @("loop spinOnce") unittest
@@ -72,7 +72,7 @@ import std.format;
         auto pubMsg = String(text);
         assertNotThrown(pub.publish(pubMsg));
 
-        assert(executor.spinOnce(100.msecs));
+        assert(executor.spinSome(100.msecs));
 
         assert(text == received, received);
     }

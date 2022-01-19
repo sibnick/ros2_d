@@ -3,6 +3,8 @@ module rcld.node;
 import rcl;
 import rcld.publisher;
 import rcld.subscription;
+import rcld.service;
+import rcld.client;
 import std.string;
 import std.exception;
 import rcld.context;
@@ -36,6 +38,16 @@ class Node
             sub.terminate(this);
         }
         subscriptions.length = 0;
+        foreach (client; clients)
+        {
+            client.terminate(this);
+        }
+        clients.length = 0;
+        foreach (service; services)
+        {
+            service.terminate(this);
+        }
+        services.length = 0;
         if (rcl_node_is_valid(&nodeHandle))
         {
             rcl_node_fini(&nodeHandle);
@@ -46,6 +58,8 @@ package:
     rcl_node_t nodeHandle;
     BasePublisher[] publishers;
     BaseSubscription[] subscriptions;
+    BaseService[] services;
+    BaseClient[] clients;
 }
 
 private enum testNamespace = "node_test_ns";

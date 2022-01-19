@@ -1,0 +1,42 @@
+// dfmt off
+module {{moduleName}};
+
+import core.stdc.stdint;
+import rcl;
+{{#depends}}
+import {{name}};
+{{/depends}}
+
+extern (C):
+@nogc:
+nothrow:
+{{#services}}
+{{#messages}}
+
+struct {{name}}
+{
+    {{#members}}
+    {{type}} {{name}};
+    {{/members}}
+}
+
+struct {{arrayName}}
+{
+    {{name}} *data;
+    size_t size;
+    size_t capacity;
+}
+
+bool {{name}}__init({{name}} * msg);
+void {{name}}__fini({{name}} * msg);
+{{name}} * {{name}}__create();
+void {{name}}__destroy({{name}} * msg);
+bool {{arrayName}}__init({{arrayName}} * array, size_t size);
+void {{arrayName}}__fini({{arrayName}} * array);
+{{arrayName}} * {{arrayName}}__create(size_t size);
+void {{arrayName}}__destroy({{arrayName}} * array);
+const(rosidl_message_type_support_t) * rosidl_typesupport_c__get_message_type_support_handle__{{name}}();
+{{/messages}}
+
+const(rosidl_service_type_support_t) * rosidl_typesupport_c__get_service_type_support_handle__{{name}}();
+{{/services}}

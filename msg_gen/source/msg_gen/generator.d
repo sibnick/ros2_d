@@ -8,8 +8,8 @@ import std.algorithm;
 import std.algorithm.comparison;
 
 import rosidl_parser;
-import msg_gen.renderers.d : renderMessageD = renderMessage;
-import msg_gen.renderers.c : renderMessageC = renderMessage;
+import msg_gen.renderers.d : renderMessageD = renderMessage, renderServiceD = renderService;
+import msg_gen.renderers.c : renderMessageC = renderMessage, renderServiceC = renderService;
 import msg_gen.renderers.dub;
 
 void generateDUB(in Manifest manifest, string outDir)
@@ -28,6 +28,16 @@ void generateDUB(in Manifest manifest, string outDir)
         write(buildPath(srcDir, "c", "msg.d"), renderMessageC(manifest.packageName, msgs));
     }
     includes ~= msgs.map!(m => m.includes).join();
+
+    auto srvs = manifest.serviceFiles.map!(f => parseAsService(readText(f))).array;
+    if (srvs)
+    {
+        const srcDir = buildPath(pkgRoot, "source", manifest.packageName);
+        mkdirRecurse(buildPath(srcDir, "c"));
+        write(buildPath(srcDir, "srv.d"), renderServiceD(manifest.packageName, srvs));
+        write(buildPath(srcDir, "c", "srv.d"), renderServiceC(manifest.packageName, srvs));
+    }
+    includes ~= srvs.map!(s => s.includes).join();
 
     auto depends = makeUniqueDepends(includes, [manifest.packageName]);
 

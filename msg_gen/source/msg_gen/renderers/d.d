@@ -24,33 +24,7 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
 
     foreach (msg; msgs)
     {
-        auto message = msg.data;
-        auto messageCxt = cxt.addSubContext("messages");
-        auto struct_ = message.structure;
-        messageCxt["name"] = struct_.namespacedType.name;
-        messageCxt["cName"] = struct_.namespacedType.toCTypeName;
-        messageCxt["cArrayName"] = new UnboundedSequence(struct_.namespacedType).toCTypeName;
-
-        foreach (member; struct_.members)
-        {
-            auto memberCxt = messageCxt.addSubContext("members");
-            auto solvedType = solveType(packageName, member.type, msg.typedefMap);
-            memberCxt["type"] = solvedType.toDTypeName;
-            memberCxt["cType"] = solvedType.toCTypeName;
-            memberCxt["name"] = member.name;
-            memberCxt["assignDtoC"]
-                = solvedType.createAssignFmtDtoC.format(member.name, member.name);
-            memberCxt["assignCtoD"]
-                = solvedType.createAssignFmtCtoD.format(member.name, member.name);
-        }
-
-        foreach (constant; message.constants)
-        {
-            auto constantCxt = cxt.addSubContext("constants");
-            constantCxt["type"] = constant.type.toDTypeName;
-            constantCxt["name"] = constant.name;
-            constantCxt["value"] = constant.value;
-        }
+        addMessageCxt(cxt, msg, msg.data);
     }
 
     MustacheEngine!string mustache_;
@@ -73,6 +47,84 @@ string renderMessage(string packageName, IdlFile!Message[] msgs)
     }
 
     assert(renderMessage(manifest.packageName, msgs).length > 100);
+}
+
+string renderService(string packageName, IdlFile!Service[] srvs)
+{
+    auto cxt = new MustacheEngine!string.Context;
+    cxt["moduleName"] = packageName ~ ".srv";
+    cxt["cModuleName"] = packageName ~ ".c.srv";
+
+    auto uniqueIncludes = srvs.map!(s => s.includes).join()
+        .makeUniqueIncludes([packageName ~ ".srv"]);
+    foreach (include; uniqueIncludes)
+    {
+        cxt.addSubContext("depends")["name"] = include;
+        cxt.addSubContext("cDepends")["name"] = makeCModuleName(include);
+    }
+
+    foreach (srv; srvs)
+    {
+        auto serviceCxt = cxt.addSubContext("services");
+        serviceCxt["name"] = srv.data.type.name;
+        serviceCxt["cName"] = srv.data.type.toCTypeName;
+        serviceCxt["requestName"] = srv.data.request.structure.namespacedType.name;
+        serviceCxt["responseName"] = srv.data.response.structure.namespacedType.name;
+
+        addMessageCxt(serviceCxt, srv, srv.data.request);
+        addMessageCxt(serviceCxt, srv, srv.data.response);
+    }
+    MustacheEngine!string mustache_;
+
+    return mustache_.renderString(import("renderers/pkg/source/pkg/srv.mustache"), cxt);
+}
+
+@("renderService") unittest
+{
+    import std : readText, writeln;
+    import test_helper.ament : amentPrefixPath;
+
+    auto manifests = findROSIDLPackages(amentPrefixPath);
+    assert(manifests.length == 1);
+    auto manifest = manifests[0];
+    IdlFile!Service[] srvs;
+    foreach (f; manifest.serviceFiles)
+    {
+        srvs ~= parseAsService(readText(f));
+    }
+
+    assert(renderService(manifest.packageName, srvs).length > 100);
+}
+
+private void addMessageCxt(T, U)(MustacheEngine!T.Context cxt, IdlFile!U idl, Message message)
+{
+    auto messageCxt = cxt.addSubContext("messages");
+    auto struct_ = message.structure;
+    messageCxt["name"] = struct_.namespacedType.name;
+    messageCxt["cName"] = struct_.namespacedType.toCTypeName;
+    messageCxt["cArrayName"] = new UnboundedSequence(struct_.namespacedType).toCTypeName;
+
+    foreach (member; struct_.members)
+    {
+        auto memberCxt = messageCxt.addSubContext("members");
+        auto solvedType = solveType(struct_.namespacedType.namespaces, member.type, idl
+                .typedefMap);
+        memberCxt["type"] = solvedType.toDTypeName;
+        memberCxt["cType"] = solvedType.toCTypeName;
+        memberCxt["name"] = member.name;
+        memberCxt["assignDtoC"]
+            = solvedType.createAssignFmtDtoC.format(member.name, member.name);
+        memberCxt["assignCtoD"]
+            = solvedType.createAssignFmtCtoD.format(member.name, member.name);
+    }
+
+    foreach (constant; message.constants)
+    {
+        auto constantCxt = cxt.addSubContext("constants");
+        constantCxt["type"] = constant.type.toDTypeName;
+        constantCxt["name"] = constant.name;
+        constantCxt["value"] = constant.value;
+    }
 }
 
 private string[] makeUniqueIncludes(Include[] includes, string[] ignoreList)
@@ -380,14 +432,14 @@ private string createAssignFmtCtoD(in AbstractType type)
         "dst.b.length = src.a.size; foreach(i;0U..dst.b.length) { dst.b[i] = src.a.data[i]; }");
 }
 
-AbstractType solveType(string packageName, AbstractType type, AbstractType[AbstractType] map)
+AbstractType solveType(in string[] namespaces, AbstractType type, AbstractType[AbstractType] map)
 {
     if (auto named = cast(NamedType) type)
     {
-        auto namespaced = new NamespacedType([packageName, "msg"], named.name);
+        auto namespaced = new NamespacedType(namespaces, named.name);
         if (namespaced in map)
         {
-            return solveType(packageName, map[namespaced], map);
+            return solveType(namespaces, map[namespaced], map);
         }
         else
         {
@@ -398,7 +450,7 @@ AbstractType solveType(string packageName, AbstractType type, AbstractType[Abstr
     {
         if (type in map)
         {
-            return solveType(packageName, map[namespaced], map);
+            return solveType(namespaces, map[namespaced], map);
         }
         else
         {
@@ -407,7 +459,7 @@ AbstractType solveType(string packageName, AbstractType type, AbstractType[Abstr
     }
     else if (auto nested = cast(AbstractNestedType) type)
     {
-        auto solved = cast(AbstractNestableType) solveType(packageName, cast(AbstractType) nested.valueType, map);
+        auto solved = cast(AbstractNestableType) solveType(namespaces, cast(AbstractType) nested.valueType, map);
         return nested.castSwitch!(
             (in ArrayType t) => cast(AbstractType) new ArrayType(solved, t.size),
             (in BoundedSequence t) => cast(AbstractType) new BoundedSequence(solved, t
@@ -452,7 +504,7 @@ AbstractType solveType(string packageName, AbstractType type, AbstractType[Abstr
         nst(ns, "test_msgs__msg__BasicTypes__3"): at(nt("test_msgs__msg__BasicTypes"), "3"),
     ];
 
-    assert(solveType("test_msgs", bt("float"), map) == bt("float"));
-    assert(solveType("test_msgs", nt("boolean__3"), map) == at(bt("boolean"), "3"));
-    assert(solveType("test_msgs", nt("test_msgs__msg__BasicTypes__3"), map) == at(nst(ns, "BasicTypes"), "3"));
+    assert(solveType(["test_msgs", "msg"], bt("float"), map) == bt("float"));
+    assert(solveType(["test_msgs", "msg"], nt("boolean__3"), map) == at(bt("boolean"), "3"));
+    assert(solveType(["test_msgs", "msg"], nt("test_msgs__msg__BasicTypes__3"), map) == at(nst(ns, "BasicTypes"), "3"));
 }

@@ -32,6 +32,6 @@ void main()
 
     while (true)
     {
-        executor.spinOnce();
+        executor.spinSome();
     }
 }

@@ -1,0 +1,82 @@
+// dfmt off
+module {{moduleName}};
+
+import std.string;
+import std.utf;
+import rcl;
+import {{cModuleName}};
+{{#depends}}
+import {{name}};
+{{/depends}}
+{{#cDepends}}
+import {{name}};
+{{/cDepends}}
+{{#services}}
+struct {{name}}
+{
+    alias Request = {{requestName}};
+    alias Response = {{responseName}};
+
+    static const(rosidl_service_type_support_t)* getTypesupport() @nogc nothrow
+    {
+        return rosidl_typesupport_c__get_service_type_support_handle__{{cName}}();
+    }
+}
+
+{{#messages}}
+struct {{name}}
+{
+    {{#members}}
+    {{type}} {{name}}{{#default?}} = {{{value}}}{{/default?}};
+    {{/members}}
+
+    {{#constants}}
+    enum {{type}} {{name}} = {{{value}}};
+    {{/constants}}
+
+    alias CType = {{cName}};
+    alias CArrayType = {{cArrayName}};
+
+    static const(rosidl_message_type_support_t)* getTypesupport() @nogc nothrow
+    {
+        return rosidl_typesupport_c__get_message_type_support_handle__{{cName}}();
+    }
+
+    static CType* createC() @nogc nothrow
+    {
+        return {{cName}}__create();
+    }
+
+    static void destroyC(ref CType * msg) @nogc nothrow
+    {
+        {{cName}}__destroy(msg);
+        msg = null;
+    }
+
+    static CArrayType *createC(size_t size) @nogc nothrow
+    {
+        return {{cArrayName}}__create(size);
+    }
+
+    static destroyC(ref CArrayType * msg) @nogc nothrow
+    {
+        {{cArrayName}}__destroy(msg);
+        msg = null;
+    }
+
+    static convert(in {{name}} src, ref {{name}}.CType dst)
+    {
+        {{#members}}
+        {{{assignDtoC}}}
+        {{/members}}
+    }
+
+    static convert(in {{name}}.CType src, out {{name}} dst)
+    {
+        {{#members}}
+        {{{assignCtoD}}}
+        {{/members}}
+    }
+}
+{{/messages}}
+{{/services}}

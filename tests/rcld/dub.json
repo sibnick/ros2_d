@@ -1,10 +1,14 @@
 {
 	"name": "tests",
-  "dependencies": {
+	"dependencies": {
 		"ros2_d:rcld": {
 			"path": "../../"
 		},
 		"silly": "~>1.1.1",
-		"std_msgs": ">=0.0.1"
-  }
+		"std_msgs": "*",
+		"example_interfaces": "*"
+	},
+	"versions": [
+		"$ROS_DISTRO"
+	]
 }

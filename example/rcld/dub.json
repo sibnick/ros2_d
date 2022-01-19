@@ -4,8 +4,11 @@
 	],
 	"copyright": "Copyright © 2021, nonanonno",
 	"dependencies": {
-		"ros2_d:rcld": "~>0.1.1",
-		"std_msgs": "*"
+		"ros2_d:rcld": {
+			"path": "../../"
+		},
+		"std_msgs": "*",
+		"example_interfaces": "*"
 	},
 	"description": "A rcld example.",
 	"license": "Apache-2.0",
@@ -27,6 +30,24 @@
 			],
 			"targetPath": "bin/",
 			"targetName": "listener",
+			"targetType": "executable"
+		},
+		{
+			"name": "client",
+			"sourcePaths": [
+				"fugen/client"
+			],
+			"targetPath": "bin/",
+			"targetName": "client",
+			"targetType": "executable"
+		},
+		{
+			"name": "service",
+			"sourcePaths": [
+				"fugen/service"
+			],
+			"targetPath": "bin/",
+			"targetName": "service",
 			"targetType": "executable"
 		}
 	]

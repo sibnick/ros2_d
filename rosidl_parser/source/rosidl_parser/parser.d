@@ -58,7 +58,7 @@ auto parseAsService(string text)
     auto p = new Parser();
     p.parse(idl);
 
-    assert(p.data.messages.length == 2);
+    assert(p.data.messages.length == 2, text);
 
     return IdlFile!Service(p.data.includes, p.data.typedefMap, new Service(p.data.messages.values));
 }
