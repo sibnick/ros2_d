@@ -27,7 +27,8 @@
 			"name": "unittest",
 			"dependencies": {
 				"ros2_d:test_helper": "*"
-			}
+			},
+			"dflags": ["-allinst"]
 		}
 	],
 	"versions": [

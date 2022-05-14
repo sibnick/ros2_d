@@ -1,0 +1,34 @@
+{
+	"name": "ldc-ros2",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			"LDC_VERSION": "1.29.0",
+			"ROS_DISTRO": "galactic"
+		}
+	},
+	"settings": {},
+	"extensions": [
+		"streetsidesoftware.code-spell-checker",
+		"eamodio.gitlens",
+		"yzhang.markdown-all-in-one",
+		"mhutchie.git-graph",
+		"donjayamanne.githistory",
+		"webfreak.dlang-bundle",
+		"editorconfig.editorconfig",
+		"ms-vscode.test-adapter-converter",
+		"hbenl.vscode-test-explorer",
+		"rti.omg-idl",
+		"nonanonno.vscode-ros2"
+	],
+	"forwardPorts": [
+		6080 // for VNC
+	],
+	"remoteUser": "vscode",
+	"features": {
+		"docker-from-docker": "latest",
+		"git": "latest",
+		"desktop-lite": "latest",
+		"common": "latest"
+	}
+}
