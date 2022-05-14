@@ -3,7 +3,7 @@
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
-			"LDC_VERSION": "1.29.0",
+			"LDC_VERSION": "1.28.1",
 			"ROS_DISTRO": "galactic"
 		}
 	},
