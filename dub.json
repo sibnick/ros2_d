@@ -3,9 +3,12 @@
 		"nonanonno"
 	],
 	"copyright": "Copyright © 2021, nonanonno",
+	"dependencies": {
+		"ros2_d:rcld": "~>0.1.1",
+		"std_msgs": ">=0.0.1"
+	},
 	"description": "ROS2 Client Library for Dlang",
 	"license": "Apache-2.0",
-	"targetType": "none",
 	"name": "ros2_d",
 	"subPackages": [
 		"./msg_gen",
@@ -13,5 +16,6 @@
 		"./rcld",
 		"./test_helper",
 		"./rosidl_parser"
-	]
+	],
+	"targetType": "none"
 }

@@ -20,7 +20,7 @@ class Subscription(Message) : BaseSubscription
         subHandle = rcl_get_zero_initialized_subscription();
         auto options = rcl_subscription_get_default_options();
         auto typesupport = Message.getTypesupport();
-        enforce(rcl_subscription_init(&subHandle, &node.nodeHandle, typesupport, name.toStringz, &options) == 0);
+        enforce(rcl_subscription_init(&subHandle, &node.nodeHandle, typesupport, cast(const(ubyte)*)name.toStringz, &options) == 0);
         node.subscriptions ~= this;
     }
 

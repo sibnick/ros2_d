@@ -21,7 +21,7 @@ class Client(ServiceType) : BaseClient
         clientHandle = rcl_get_zero_initialized_client();
         auto option = rcl_client_get_default_options();
         auto typesupport = ServiceType.getTypesupport();
-        enforce(rcl_client_init(&clientHandle, &node.nodeHandle, typesupport, name.toStringz, &option) == 0);
+        enforce(rcl_client_init(&clientHandle, &node.nodeHandle, typesupport, cast(const(ubyte)*)name.toStringz, &option) == 0);
         node.clients ~= this;
     }
 

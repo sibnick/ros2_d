@@ -17,7 +17,7 @@ class Publisher(Message) : BasePublisher
         pubHandle = rcl_get_zero_initialized_publisher();
         auto options = rcl_publisher_get_default_options();
         auto typesupport = Message.getTypesupport();
-        enforce(rcl_publisher_init(&pubHandle, &node.nodeHandle, typesupport, name.toStringz, &options) == 0);
+        enforce(rcl_publisher_init(&pubHandle, &node.nodeHandle, typesupport, cast(const(ubyte)*)name.toStringz, &options) == 0);
         node.publishers ~= this;
     }
 

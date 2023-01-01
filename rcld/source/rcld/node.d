@@ -17,7 +17,7 @@ class Node
         auto options = rcl_node_get_default_options();
         scope (exit)
             rcl_node_options_fini(&options);
-        enforce(rcl_node_init(&nodeHandle, name.toStringz, namespace.toStringz, &context.context, &options) == 0);
+        enforce(rcl_node_init(&nodeHandle, cast(const(ubyte)*)name.toStringz, cast(const(ubyte)*)namespace.toStringz, &context.context, &options) == 0);
         context.nodes ~= this;
     }
 

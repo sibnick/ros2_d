@@ -21,7 +21,7 @@ class Service(ServiceType) : BaseService
         serviceHandle = rcl_get_zero_initialized_service();
         auto option = rcl_service_get_default_options();
         auto typesupport = ServiceType.getTypesupport();
-        enforce(rcl_service_init(&serviceHandle, &node.nodeHandle, typesupport, name.toStringz, &option) == RCL_RET_OK);
+        enforce(rcl_service_init(&serviceHandle, &node.nodeHandle, typesupport, cast(const(ubyte)*)name.toStringz, &option) == RCL_RET_OK);
         node.services ~= this;
     }
 

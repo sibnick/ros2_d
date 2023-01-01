@@ -15,7 +15,7 @@ class Context
         scope (exit)
             rcl_init_options_fini(&options);
         context = rcl_context_t();
-        enforce(rcl_init(args.argc, args.argv, &options, &context) == 0);
+        enforce(rcl_init(args.argc, cast(const(ubyte*)*)args.argv, &options, &context) == 0);
     }
 
     void shutdown()

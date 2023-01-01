@@ -16,7 +16,7 @@
 	"libs": [
 		"rcl",
 		"rcutils",
-		"rosidl_typesupport_c",
-		"rosidl_runtime_c"
+		"rosidl_generator_c",
+		"rosidl_typesupport_c"
 	]
 }
