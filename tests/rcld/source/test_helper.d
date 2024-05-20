@@ -22,6 +22,10 @@ template makeNamespace()
         {
             id ~= "_rolling";
         }
+        version (humble)
+        {
+            id ~= "_humble";
+        }
         return id;
     }
 }

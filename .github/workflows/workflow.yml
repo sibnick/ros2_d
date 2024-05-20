@@ -22,6 +22,7 @@ jobs:
           - ros: foxy
           - ros: galactic
           - ros: rolling
+          - ros: humble
 
     runs-on: ${{ matrix.ros }}
     env:

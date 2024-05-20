@@ -7,11 +7,18 @@
 	"license": "Apache-2.0",
 	"targetType": "none",
 	"name": "ros2_d",
+	"dependencies": {
+		":msg_gen": "*",
+		":rcl_bind": "*",
+		":rcld": "*",
+		":test_helper": "*",
+		":rosidl_parser": "*"
+	},
 	"subPackages": [
-		"./msg_gen",
-		"./rcl_bind",
-		"./rcld",
-		"./test_helper",
-		"./rosidl_parser"
+		"msg_gen",
+		"rcl_bind",
+		"rcld",
+		"test_helper",
+		"rosidl_parser"
 	]
 }

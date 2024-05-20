@@ -79,7 +79,7 @@ void generateDUB(in Manifest manifest, string outDir)
 
 void generateDUBAsDepend(in Manifest m, string outDir)
 {
-    const dir = buildPath(outDir, m.packageName ~ "-" ~ m.version_);
+    const dir = buildPath(outDir, m.packageName ~ "/" ~ m.version_);
 
     mkdirRecurse(dir);
     write(buildPath(dir, m.packageName ~ ".lock"), "");

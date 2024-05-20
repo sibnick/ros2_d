@@ -64,6 +64,7 @@ auto findVacantDomainID()
 version (foxy) pragma(msg, "ROS_DISTRO is foxy");
 version (galactic) pragma(msg, "ROS_DISTRO is galactic");
 version (rolling) pragma(msg, "ROS_DISTRO is rolling");
+version (humble) pragma(msg, "ROS_DISTRO is humble");
 
 @("choose different domain_id") unittest
 {

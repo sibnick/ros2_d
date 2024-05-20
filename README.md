@@ -70,6 +70,7 @@ Here is a [example pacakge](example).
     - Foxy
     - Galactic
     - Rolling
+    - Humble
 - Dlang
     - dmd (tested with dmd-2.098.0)
 - CPU

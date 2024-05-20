@@ -8,6 +8,7 @@
 	"name": "rcl_bind",
 	"targetType": "sourceLibrary",
 	"preGenerateCommands": [
+		"rdmd gen_mk.d > gen.mk",
 		"make -f gen.mk"
 	],
 	"lflags": [
